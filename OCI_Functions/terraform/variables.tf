@@ -25,4 +25,9 @@ variable "place_order_function_ocid" {
 
 variable "nosql_table_name" {
   default = "customer_info"
+}
+
+variable "container_repository_name" {
+  description = "Name of the OCI Container Repository"
+  default     = "Customer_Info_Container_Repository"
 } 

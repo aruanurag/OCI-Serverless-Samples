@@ -1,6 +1,7 @@
 # Terraform
 OCI_Functions/terraform/.terraform/
 OCI_Functions/terraform/terraform.tfstate*
+OCI_Functions/terraform/.terraform*
 
 # Go build  
 OCI_Functions/functions/*/bin/
