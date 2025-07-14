@@ -1,0 +1,17 @@
+# Terraform
+OCI_Functions/terraform/.terraform/
+OCI_Functions/terraform/terraform.tfstate*
+
+# Go build  
+OCI_Functions/functions/*/bin/
+OCI_Functions/functions/*/vendor/
+
+# Editor
+*.swp
+*.swo
+.idea/
+.vscode/
+.DS_Store 
+
+# Local Terraform variable overrides
+OCI_Functions/terraform/terraform_local.tfvars 
