@@ -1,0 +1,6 @@
+schema_version: 20180708
+name: post-customer-info
+version: 0.0.1
+description: Post customer information (POST)
+runtime: go
+entrypoint: ./func.go 

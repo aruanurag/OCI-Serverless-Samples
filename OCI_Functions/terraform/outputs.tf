@@ -1,0 +1,1 @@
+// outputs.tf - Define outputs for your OCI resources here 

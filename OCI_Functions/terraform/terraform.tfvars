@@ -1,0 +1,7 @@
+region                    = "us-ashburn-1"
+compartment_ocid          = "ocid1.compartment.oc1..exampleuniqueID"
+subnet_ocid               = "ocid1.subnet.oc1..exampleuniqueID"
+get_customer_function_ocid = "ocid1.fnfunc.oc1..getcustomerfuncid"
+post_customer_function_ocid = "ocid1.fnfunc.oc1..postcustomerfuncid"
+place_order_function_ocid   = "ocid1.fnfunc.oc1..placeorderfuncid"
+nosql_table_name            = "customer_info" 
