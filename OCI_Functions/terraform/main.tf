@@ -76,3 +76,9 @@ output "nosql_table_id" {
 #     "Allow dynamic-group ${oci_identity_dynamic_group.functions_group.name} to use nosql-tables in compartment id ${var.compartment_ocid}"
 #   ]
 # } 
+
+resource "oci_artifacts_container_repository" "container_repo" {
+  compartment_id = var.compartment_ocid
+  display_name   = var.container_repository_name
+  is_public      = false
+} 
