@@ -50,6 +50,9 @@ resource "oci_nosql_table" "customer_info" {
     CREATE TABLE ${var.nosql_table_name} (
       customerId STRING,
       name STRING,
+      address STRING,
+      email STRING,
+      phone STRING,
       PRIMARY KEY (customerId)
     )
   DDL
