@@ -3,20 +3,29 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+
+	fdk "github.com/fnproject/fdk-go"
 )
 
-type CustomerInfo struct {
-	ID   string `json:"id"`
+func main() {
+	fdk.Handle(fdk.HandlerFunc(myHandler))
+}
+
+type Person struct {
 	Name string `json:"name"`
 }
 
-func main() {
-	// OCI Functions entrypoint
-	fn := func(ctx context.Context, input []byte) ([]byte, error) {
-		// For GET, input is usually empty or contains query params
-		info := CustomerInfo{ID: "123", Name: "John Doe"}
-		return json.Marshal(info)
+func myHandler(ctx context.Context, in io.Reader, out io.Writer) {
+	p := &Person{Name: "World"}
+	json.NewDecoder(in).Decode(p)
+	msg := struct {
+		Msg string `json:"message"`
+	}{
+		Msg: fmt.Sprintf("Hello %s", p.Name),
 	}
-	// OCI Functions Go handler registration
-	_ = fn
+	log.Print("Inside Go Hello World function")
+	json.NewEncoder(out).Encode(&msg)
 }
