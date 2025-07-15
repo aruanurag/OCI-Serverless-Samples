@@ -1,1 +1,3 @@
-// outputs.tf - Define outputs for your OCI resources here 
+output "nosql_table_id" {
+  value = module.nosql.nosql_table_id
+} 
