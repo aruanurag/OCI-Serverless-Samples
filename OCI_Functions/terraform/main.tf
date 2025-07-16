@@ -22,7 +22,6 @@ module "nosql" {
 }
 
 resource "oci_functions_application" "test_application" {
-    #Required
     compartment_id = var.compartment_ocid
     display_name = var.application_display_name
     subnet_ids = [var.subnet_ocid]
