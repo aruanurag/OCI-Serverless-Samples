@@ -19,3 +19,8 @@ variable "container_repository_name" {
   description = "Name of the OCI Container Repository"
   default     = "customer_info_repo"
 } 
+
+variable "application_display_name" {
+  description = "Name of function application"
+  default     = "customer_info_app"
+}

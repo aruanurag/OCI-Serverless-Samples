@@ -21,6 +21,13 @@ module "nosql" {
   nosql_table_name = var.nosql_table_name
 }
 
+resource "oci_functions_application" "test_application" {
+    #Required
+    compartment_id = var.compartment_ocid
+    display_name = var.application_display_name
+    subnet_ids = [var.subnet_ocid]
+}
+
 module "container_repository" {
   source                    = "./modules/container_repository"
   compartment_id            = var.compartment_ocid
