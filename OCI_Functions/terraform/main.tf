@@ -21,10 +21,11 @@ module "nosql" {
   nosql_table_name = var.nosql_table_name
 }
 
-resource "oci_functions_application" "test_application" {
+resource "oci_functions_application" "customer_info_app" {
     compartment_id = var.compartment_ocid
     display_name = var.application_display_name
     subnet_ids = [var.subnet_ocid]
+    shape = "GENERIC_ARM"
 }
 
 module "container_repository" {
