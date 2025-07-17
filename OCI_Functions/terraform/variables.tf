@@ -1,4 +1,8 @@
 
+variable "tenancy_ocid" {
+  default = "ocid1.tenancy.oc1..exampleuniqueID"
+}
+
 variable "region" {
   default = "us-ashburn-1"
 }
