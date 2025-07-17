@@ -1,6 +1,3 @@
 region                    = "us-ashburn-1"
 compartment_ocid          = "ocid1.compartment.oc1..aaaaaaaaeznoiwltozqx743ouawaxyhilrugnz6v3harjvrwhw6u2lhd6jpa"
 subnet_ocid               = "ocid1.subnet.oc1.iad.aaaaaaaag4magdnmdo4gb7vyozsagbdlwnmpxaewr5nxcepiphdjyzamx7ca"
-get_customer_function_ocid = "ocid1.fnfunc.oc1..getcustomerfuncid"
-post_customer_function_ocid = "ocid1.fnfunc.oc1..postcustomerfuncid"
-place_order_function_ocid   = "ocid1.fnfunc.oc1..placeorderfuncid"
