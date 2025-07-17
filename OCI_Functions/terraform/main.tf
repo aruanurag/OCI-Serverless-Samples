@@ -39,6 +39,11 @@ resource "oci_functions_function" "my_functions" {
   application_id = oci_functions_application.customer_info_app.id
   image = each.value.source_image
   memory_in_mbs      = 128
+  config = {
+     "COMPARTMENT_ID" = var.compartment_ocid,
+     "OCI_REGION" = var.region,
+     "NOSQL_TABLE_NAME" = var.nosql_table_name
+  }
 }
 
 module "container_repository" {
