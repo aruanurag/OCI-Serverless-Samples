@@ -45,11 +45,39 @@ functions/
 
 ### Outputs
 - The API Gateway endpoint and NoSQL table OCID will be displayed after a successful apply.
-
 ### Troubleshooting
 - If you get authorization errors, ensure you have the correct IAM policies in OCI for API Gateway and NoSQL access.
 - If you get DDL errors for NoSQL, check the DDL syntax in `main.tf`.
 
+---
+## Building and Deploying function images
+### Prerequisites 
+- [Docker](https://docs.docker.com/engine/install/) installed
+
+### Steps
+1. **Navigate to the functions directory:**
+   ```sh
+   cd functions
+   ```
+2. **Follow [these docs](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm) to log in to the created registry with Docker.**
+3. **Build the function image and tag it with the necessary information:**
+   
+   *Replacing information in the braces <> with your environment details*
+   ```sh
+   docker build -t <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo get-customer-info/
+   ```
+4. **Push the image to the registry:**
+   ```sh
+   docker push <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo
+   ```
+5. **Update the *source_image* parameter under the *functions* tf variable:**
+
+   *Replace null with* `<region-key>.ocir.io/<tenancy-namespace>/customer-info-repo:latest` 
+
+6. **After updating the function image value, re-run the terraform script:**
+   ```sh
+   terraform apply -var-file=terraform.tfvars --auto-approve
+   ```
 ---
 
 See each subdirectory for more details. 
