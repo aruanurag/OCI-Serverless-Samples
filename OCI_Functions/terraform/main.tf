@@ -39,6 +39,27 @@ resource "oci_functions_function" "my_functions" {
   application_id = oci_functions_application.customer_info_app.id
   image = each.value.source_image
   memory_in_mbs      = 128
+  config = {
+     "COMPARTMENT_ID" = var.compartment_ocid,
+     "OCI_REGION" = var.region,
+     "NOSQL_TABLE_NAME" = var.nosql_table_name
+  }
+}
+
+resource "oci_identity_policy" "function_nosql_policy" {
+    compartment_id = var.compartment_ocid
+    description = "Allows function applications to use NoSQL tables"
+    name = "function_nosql_access"
+    statements = [
+      "Allow dynamic-group function_dynamic_group to manage nosql-family in compartment id ${var.compartment_ocid}"
+    ]
+}
+
+resource "oci_identity_dynamic_group" "function_dynamic_group" {
+    compartment_id = var.tenancy_ocid
+    description = "Dynamic group containing all functions in compartment ${var.compartment_ocid}"
+    matching_rule = "ALL {resource.type = 'fnfunc', resource.compartment.id = '${var.compartment_ocid}'}"
+    name = "function_dynamic_group"
 }
 
 module "container_repository" {
