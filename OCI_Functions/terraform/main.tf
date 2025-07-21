@@ -32,11 +32,13 @@ module "functions" {
   source            = "./modules/functions"
   for_each          = { for name, f in var.functions : name => f if f.source_image != null }
   function_name     = each.key
-  application_id    = oci_functions_application.customer_info_app.id
+  application_id    = oci_functions_application.customer_info_app.id  
+  path              = each.value.path
   source_image      = each.value.source_image
   compartment_id    = var.compartment_ocid
   region            = var.region
   nosql_table_name  = var.nosql_table_name
+  apigw_id          = module.apigateway.gateway_id
 }
 
 resource "oci_identity_policy" "function_nosql_policy" {

@@ -9,4 +9,22 @@ resource "oci_functions_function" "fn" {
     "OCI_REGION"       = var.region
     "NOSQL_TABLE_NAME" = var.nosql_table_name
   }
+}
+
+resource "oci_apigateway_deployment" "customer_info" {
+  compartment_id = var.compartment_id
+  gateway_id     = var.apigw_id
+  display_name   = var.function_name
+  path_prefix    = "/api"
+
+  specification {
+    routes {
+      path   = var.path
+      methods = ["GET"]
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.fn.id
+      }
+    }
+  }
 } 
