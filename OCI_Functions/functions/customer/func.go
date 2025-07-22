@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 
 	fdk "github.com/fnproject/fdk-go"
@@ -34,29 +35,24 @@ func main() {
 
 // myHandler dispatches requests based on the method specified in the request body.
 func myHandler(ctx context.Context, in io.Reader, out io.Writer) {
-	// Parse the request to get the HTTP method
+	httpCtx, ok := fdk.GetContext(ctx).(fdk.HTTPContext)
+	if !ok {
+		fdk.WriteStatus(out, 400)
+		fdk.SetHeader(out, "Content-Type", "application/json")
+		io.WriteString(out, `{"error":"function not invoked via http trigger","status":400}`)
+		return
+	}
+
 	var req Request
-	if err := json.NewDecoder(in).Decode(&req); err != nil && err != io.EOF {
-		log.Printf("failed to parse request: %v", err)
+	if err := json.NewDecoder(in).Decode(&req); err != nil {
+		log.Printf("[%s] Failed to parse request: %v", err)
 		httpError(out, "Invalid input", 400, err)
 		return
 	}
 
-	httpCtx, ok := fdk.GetContext(ctx).(fdk.HTTPContext)
-	if !ok {
-		// optionally, this may be a good idea
-		fdk.WriteStatus(out, 400)
-		fdk.SetHeader(out, "Content-Type", "application/json")
-		io.WriteString(out, `{"error":"function not invoked via http trigger"}`)
-		return
-	}
-
-	// Get the HTTP method from the request
-	httpMethod := httpCtx.RequestMethod()
-
 	client, err := setupNoSQLClient()
 	if err != nil {
-		log.Printf("%v", err)
+		log.Printf("[%s] Failed to setup NoSQL client: %v", err)
 		httpError(out, "Internal error", 500, err)
 		return
 	}
@@ -64,14 +60,37 @@ func myHandler(ctx context.Context, in io.Reader, out io.Writer) {
 
 	tableName := getTableName()
 
-	switch httpMethod {
+	switch httpCtx.RequestMethod() {
 	case "GET":
-		handleGetRequest(ctx, req.Data, out, client, tableName)
+		// Get the request URL
+		requestURL := httpCtx.RequestURL()
+		if requestURL == "" {
+			httpError(out, "Request URL is empty", 400, nil)
+			return
+		}
+
+		// Parse the URL
+		parsedURL, err := url.Parse(requestURL)
+		if err != nil {
+			log.Printf("Failed to parse request URL: %v", err)
+			httpError(out, "Invalid request URL", 400, err)
+			return
+		}
+
+		// Extract query parameters
+		queryParams := parsedURL.Query()
+		customerID := queryParams.Get("id") // Get the 'id' query parameter
+		if customerID == "" {
+			log.Printf("Missing required query parameter: id")
+			httpError(out, "Missing required query parameter: id", 400, nil)
+			return
+		}
+		handleGetRequest(ctx, customerID, out, client, tableName)
 	case "POST":
 		handlePostRequest(ctx, req.Data, out, client, tableName)
 	default:
-		err := fmt.Errorf("unsupported HTTP method: %s", httpMethod)
-		log.Printf("%v", err)
+		err := fmt.Errorf("unsupported HTTP method: %s", httpCtx.RequestMethod())
+		log.Printf("[%s] %v", err)
 		httpError(out, "Method not allowed", 405, err)
 	}
 }
@@ -180,13 +199,7 @@ func putCustomer(client *nosqldb.Client, tableName string, info CustomerInfo) er
 }
 
 // handleGetRequest processes GET requests to retrieve customer data.
-func handleGetRequest(ctx context.Context, in []byte, out io.Writer, client *nosqldb.Client, tableName string) {
-	customerID, err := parseGetRequest(in)
-	if err != nil {
-		log.Printf("%v", err)
-		httpError(out, "Invalid input", 400, err)
-		return
-	}
+func handleGetRequest(ctx context.Context, customerID string, out io.Writer, client *nosqldb.Client, tableName string) {
 
 	info, err := getCustomer(client, tableName, customerID)
 	if err != nil {
