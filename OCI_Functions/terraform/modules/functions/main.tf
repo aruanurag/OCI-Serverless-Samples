@@ -20,7 +20,7 @@ resource "oci_apigateway_deployment" "customer_info" {
   specification {
     routes {
       path   = var.path
-      methods = ["GET"]
+      methods = ["GET", "POST"]
       backend {
         type        = "ORACLE_FUNCTIONS_BACKEND"
         function_id = oci_functions_function.fn.id
