@@ -62,7 +62,7 @@ functions/
 2. **Follow [these docs](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm) to log in to the created registry with Docker.**
 3. **Build the function image and tag it with the necessary information:**
    
-   *Replace <repo_path> with the 'repository_path' value, without quotes - which is output after running `terraform apply`*
+   *Replace <repo_path> with the 'repository_path' value - which is output after running `terraform apply`*
    ```sh
    docker build -t <repo_path> customer/
    ```
