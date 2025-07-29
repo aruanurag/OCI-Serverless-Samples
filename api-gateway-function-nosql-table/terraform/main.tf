@@ -1,5 +1,22 @@
+terraform {
+  required_providers {
+    oci = {
+      source  = "oracle/oci"
+      version = "= 7.9.0"
+    }
+  }
+}
+
+provider "oci" {}
+
+module "apigateway" {
+  source         = "../../terraform/modules/apigateway"
+  compartment_id = var.compartment_ocid
+  subnet_id      = var.subnet_ocid
+}
+
 module "nosql" {
-  source           = "../nosql"
+  source           = "../../terraform/modules/nosql"
   compartment_id   = var.compartment_ocid
   nosql_table_name = var.nosql_table_name
 }
@@ -12,7 +29,7 @@ resource "oci_functions_application" "customer_info_app" {
 }
 
 module "functions" {
-  source            = "../functions"
+  source            = "../../terraform/modules/functions"
   for_each          = { for name, f in var.functions : name => f if f.source_image != null }
   function_name     = each.key
   application_id    = oci_functions_application.customer_info_app.id  
@@ -21,7 +38,7 @@ module "functions" {
   compartment_id    = var.compartment_ocid
   region            = var.region
   nosql_table_name  = var.nosql_table_name
-  apigw_id          = var.apigw_id
+  apigw_id          = module.apigateway.gateway_id
 }
 
 resource "oci_identity_policy" "function_nosql_policy" {
@@ -41,7 +58,7 @@ resource "oci_identity_dynamic_group" "function_dynamic_group" {
 }
 
 module "container_repository" {
-  source                    = "../container_repository"
+  source                    = "../../terraform/modules/container_repository"
   compartment_id            = var.compartment_ocid
   container_repository_name = var.container_repository_name
 } 

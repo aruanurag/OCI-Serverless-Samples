@@ -3,8 +3,8 @@ variable "compartment_ocid" {
   type        = string
 }
 
-variable "nosql_table_name" {
-  description = "The name of the NoSQL table."
+variable "queue_name" {
+  description = "The name of the OCI queue."
   type        = string
 }
 

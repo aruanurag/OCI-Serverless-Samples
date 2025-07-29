@@ -5,8 +5,8 @@ OCI_Functions/terraform/.terraform*
 OCI_Functions/terraform/.terraform.lock.hcl
 
 # Go build  
-OCI_Functions/functions/*/bin/
-OCI_Functions/functions/*/vendor/
+**/bin/
+**/vendor/
 
 # Editor
 *.swp
@@ -18,3 +18,8 @@ OCI_Functions/functions/*/vendor/
 # Local Terraform variable overrides
 OCI_Functions/terraform/terraform_local.tfvars 
 **/.terraform.lock.hcl 
+**/terraform_local.tfvars  
+**/.terraform*
+api-gateway-function-nosql-table/terraform/terraform.tfstate.backup
+
+api-gateway-function-nosql-table/terraform/terraform.tfstate

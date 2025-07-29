@@ -1,4 +1,3 @@
-
 resource "oci_functions_function" "fn" {
   display_name   = var.function_name
   application_id = var.application_id

@@ -1,0 +1,6 @@
+schema_version: 20180708
+name: place-order
+version: 0.0.1
+description: Place an order and send to queue (POST)
+runtime: go
+entrypoint: ./func 

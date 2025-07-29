@@ -10,15 +10,15 @@ terraform {
 provider "oci" {}
 
 module "apigateway" {
-  source         = "./modules/apigateway"
+  source         = "../../terraform/modules/apigateway"
   compartment_id = var.compartment_ocid
   subnet_id      = var.subnet_ocid
 }
 
-module "apigw_function_nosql" {
-  source                    = "./modules/apigw_function_nosql"
+module "apigw_function_queue" {
+  source                    = "../../terraform/modules/apigw_function_queue"
   compartment_ocid          = var.compartment_ocid
-  nosql_table_name          = var.nosql_table_name
+  queue_name                = var.queue_name
   application_display_name  = var.application_display_name
   subnet_ocid               = var.subnet_ocid
   functions                 = var.functions
