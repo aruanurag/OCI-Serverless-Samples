@@ -64,7 +64,7 @@ functions/
    
    *Replacing information in the braces <> with your environment details*
    ```sh
-   docker build -t <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo get-customer-info/
+   docker build -t <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo customer/
    ```
 4. **Push the image to the registry:**
    ```sh
