@@ -21,7 +21,8 @@ functions/
 ### Prerequisites
 - [Terraform](https://www.terraform.io/downloads.html) installed
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliconfigure.htm) configured locally
-- [Virtual Cloud Network](https://docs.oracle.com/en/solutions/wls-on-prem-to-oci/use-wizard-create-vcn.html) with a public subnet and port 443 allowed
+- [Virtual Cloud Network](https://docs.oracle.com/en/solutions/wls-on-prem-to-oci/use-wizard-create-vcn.html) with a public subnet
+- [Security rule](https://docs.oracle.com/en-us/iaas/Content/developer/functions/func-api-gtw/01-summary.htm#unique_1967189299) on the subnet allowing HTTPS(443) ingress
 
 ### Steps
 1. **Navigate to the Terraform directory:**
