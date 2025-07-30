@@ -8,8 +8,7 @@ This project contains:
 ```
 terraform/                # Terraform code for OCI resources
 functions/
-  get-customer-info/      # Go code for GET Customer Info function
-  post-customer-info/     # Go code for POST Customer Info function
+  customer/               # Go code for GET and POST Customer Info functions
   place-order/            # Go code for Place Order function
 ```
 
@@ -21,8 +20,8 @@ functions/
 
 ### Prerequisites
 - [Terraform](https://www.terraform.io/downloads.html) installed
-- OCI CLI configured, or your API keys and OCIDs available
-- Proper IAM policies set in OCI for API Gateway and NoSQL (see error troubleshooting)
+- [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliconfigure.htm) configured locally
+- [Virtual Cloud Network](https://docs.oracle.com/en/solutions/wls-on-prem-to-oci/use-wizard-create-vcn.html) with a public subnet and port 443 allowed
 
 ### Steps
 1. **Navigate to the Terraform directory:**
