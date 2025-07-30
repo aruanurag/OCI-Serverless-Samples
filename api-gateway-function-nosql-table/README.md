@@ -77,6 +77,8 @@ functions/
    ```sh
    terraform apply -var-file=terraform.tfvars --auto-approve
    ```
+### Troubleshooting
+- If you get the error `Invalid Invalid image - Function's image architecture 'x86' is incompatible with the application's shape type 'GENERIC_ARM'`, you need to update the oci_functions_application resource. Change `shape = "GENERIC_ARM"` to `shape = "GENERIC_X86"` in `main.tf`
 ---
 
 See each subdirectory for more details. 
