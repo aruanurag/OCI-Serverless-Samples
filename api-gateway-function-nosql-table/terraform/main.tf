@@ -52,10 +52,19 @@ module "functions" {
 
 resource "oci_identity_policy" "function_nosql_policy" {
   compartment_id = var.compartment_ocid
-  description    = "Allows function applications to use NoSQL tables"
+  description    = "Allows function applications to use NoSQL tables in compartment ${var.compartment_ocid}"
   name           = "function_nosql_access"
   statements     = [
     "Allow dynamic-group function_dynamic_group to manage nosql-family in compartment id ${var.compartment_ocid}"
+  ]
+}
+
+resource "oci_identity_policy" "apigw_function_policy" {
+  compartment_id = var.compartment_ocid
+  description    = "Allows API Gateways to use functions in compartment ${var.compartment_ocid}"
+  name           = "apigw_function_access"
+  statements     = [
+    "Allow dynamic-group apigw_dynamic_group to manage functions-family in compartment id ${var.compartment_ocid}"
   ]
 }
 
@@ -64,6 +73,13 @@ resource "oci_identity_dynamic_group" "function_dynamic_group" {
   description    = "Dynamic group containing all functions in compartment ${var.compartment_ocid}"
   matching_rule  = "ALL {resource.type = 'fnfunc', resource.compartment.id = '${var.compartment_ocid}'}"
   name           = "function_dynamic_group"
+}
+
+resource "oci_identity_dynamic_group" "apigw_dynamic_group" {
+  compartment_id = var.tenancy_ocid
+  description    = "Dynamic group containing all API Gateways in compartment ${var.compartment_ocid}"
+  matching_rule  = "ALL {resource.type = 'ApiGateway', resource.compartment.id = '${var.compartment_ocid}'}"
+  name           = "apigw_dynamic_group"
 }
 
 module "container_repository" {

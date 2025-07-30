@@ -62,17 +62,17 @@ functions/
 2. **Follow [these docs](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm) to log in to the created registry with Docker.**
 3. **Build the function image and tag it with the necessary information:**
    
-   *Replacing information in the braces <> with your environment details*
+   *Replace <repo_path> with the 'repository_path' value - which is output after running `terraform apply`*
    ```sh
-   docker build -t <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo get-customer-info/
+   docker build -t <repo_path> customer/
    ```
 4. **Push the image to the registry:**
    ```sh
-   docker push <region-key>.ocir.io/<tenancy-namespace>/customer-info-repo
+   docker push <repo_path>
    ```
 5. **Update the *source_image* parameter under the *functions* tf variable:**
 
-   *Replace null with* `<region-key>.ocir.io/<tenancy-namespace>/customer-info-repo:latest` 
+   *Replace null with* `<repo_path>:latest` 
 
 6. **After updating the function image value, re-run the terraform script:**
    ```sh
