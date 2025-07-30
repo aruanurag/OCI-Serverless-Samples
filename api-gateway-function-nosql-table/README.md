@@ -70,9 +70,9 @@ functions/
    ```sh
    docker push <repo_path>
    ```
-5. **Update the *source_image* parameter under the *functions* tf variable:**
+5. **Update the *source_image* parameter under the *functions* tf variable in .tfvars:**
 
-   *Replace null with* `<repo_path>:latest` 
+   *Replace `null` with* `<repo_path>:latest` 
 
 6. **After updating the function image value, re-run the terraform script:**
    ```sh
