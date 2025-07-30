@@ -9,6 +9,14 @@ terraform {
 
 provider "oci" {}
 
+locals {
+  function_configs = {      
+      COMPARTMENT_ID = var.compartment_ocid
+      OCI_REGION     = var.region
+      NOSQL_TABLE_NAME = var.nosql_table_name
+  }
+}
+
 module "apigateway" {
   source         = "../../terraform/modules/apigateway"
   compartment_id = var.compartment_ocid
@@ -37,8 +45,9 @@ module "functions" {
   source_image      = each.value.source_image
   compartment_id    = var.compartment_ocid
   region            = var.region
-  nosql_table_name  = var.nosql_table_name
   apigw_id          = module.apigateway.gateway_id
+  function_config   = local.function_configs
+  
 }
 
 resource "oci_identity_policy" "function_nosql_policy" {

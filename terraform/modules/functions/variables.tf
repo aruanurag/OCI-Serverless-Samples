@@ -23,10 +23,6 @@ variable "region" {
   type        = string
 }
 
-variable "nosql_table_name" {
-  description = "The name of the NoSQL table."
-  type        = string
-}
 
 variable "path" {
   description = "The API Gateway path for the function route."
@@ -39,3 +35,12 @@ variable "apigw_id" {
   type        = string
   default     = null
 } 
+
+variable "function_config" {
+  type = map(string)
+  # default = {
+  #   COMPARTMENT_ID   = ""
+  #   OCI_REGION       = ""
+  #   NOSQL_TABLE_NAME = ""
+  # }
+}

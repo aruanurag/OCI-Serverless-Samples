@@ -34,17 +34,14 @@ variable "functions" {
   type = map(object({
     source_image = optional(string, null)
     path = optional(string, null)
+    config = map(string)
   }))
   default = {
     "place-order" = {
       # This function will be SKIPPED because its source_image is null.
       source_image = null #Change this to image name after uploading image to OCIR
       path = "/order"
-    }
-    "process-order" = {
-      # This function will be SKIPPED because its source_image is null.
-      source_image = null #Change this to image name after uploading image to OCIR
-      path = "/process"
+      config = {}
     }
   }
 } 

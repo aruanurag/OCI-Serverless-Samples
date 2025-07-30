@@ -3,11 +3,7 @@ resource "oci_functions_function" "fn" {
   application_id = var.application_id
   image          = var.source_image
   memory_in_mbs  = 128
-  config = {
-    "COMPARTMENT_ID"   = var.compartment_id
-    "OCI_REGION"       = var.region
-    "NOSQL_TABLE_NAME" = var.nosql_table_name
-  }
+  config = var.function_config
 }
 
 resource "oci_apigateway_deployment" "customer_info" {

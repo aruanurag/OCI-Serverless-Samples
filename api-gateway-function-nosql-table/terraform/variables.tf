@@ -29,6 +29,7 @@ variable "application_display_name" {
   default     = "customer_info_app"
 }
 
+
 variable "functions" {
   description = "A map of function configurations. The key is the function name."
   type = map(object({
@@ -41,17 +42,9 @@ variable "functions" {
       # This function will be SKIPPED because its source_image is null.
       source_image = null #Change this to image name after uploading image to OCIR
       path = "/customer"
-    }
-    "place-order" = {
-      # This function will be SKIPPED because its source_image is null.
-      source_image = null #Change this to image name after uploading image to OCIR
-      path = "/order"
-    }
-    "post_customer_info" = {
-      # This function will be SKIPPED because its source_image is null.
-      source_image = null #Change this to image name after uploading image to OCIR
-      path = "/customer"
-    }
+    }   
   }
 }
+
+
 

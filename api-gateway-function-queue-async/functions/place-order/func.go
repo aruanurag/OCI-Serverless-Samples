@@ -8,7 +8,8 @@ import (
 	"os"
 
 	fdk "github.com/fnproject/fdk-go"
-	"github.com/oracle/oci-go-sdk/v65/common"
+	"github.com/oracle/oci-go-sdk/v36/common"
+	"github.com/oracle/oci-go-sdk/v65/common/auth"
 	"github.com/oracle/oci-go-sdk/v65/queue"
 )
 
@@ -36,14 +37,14 @@ func placeOrderHandler(ctx context.Context, in io.Reader, out io.Writer) {
 		fmt.Fprint(out, `{"error": "QUEUE_URL not set"}`)
 		return
 	}
-
-	provider, err := common.DefaultConfigProvider()
+	provider, err := auth.InstancePrincipalConfigurationProvider()
 	if err != nil {
 		fdk.WriteStatus(out, 500)
-		fmt.Fprintf(out, `{"error": "Failed to get OCI config: %v"}`, err)
+		fmt.Fprintf(out, `{"error": "Error creating resource principal configuration provider: %v"}`, err)
 		return
 	}
 
+	// Create a Queue client using the resource principal configuration provider
 	queueClient, err := queue.NewQueueClientWithConfigurationProvider(provider)
 	if err != nil {
 		fdk.WriteStatus(out, 500)
