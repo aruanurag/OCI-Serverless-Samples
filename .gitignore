@@ -23,3 +23,5 @@ OCI_Functions/terraform/terraform_local.tfvars
 api-gateway-function-nosql-table/terraform/terraform.tfstate.backup
 
 api-gateway-function-nosql-table/terraform/terraform.tfstate
+api-gateway-function-queue-async/terraform/terraform.tfstate.backup
+api-gateway-function-queue-async/terraform/terraform.tfstate

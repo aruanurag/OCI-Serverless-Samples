@@ -1,6 +1,8 @@
 schema_version: 20180708
-name: place-order
-version: 0.0.1
-description: Place an order and send to queue (POST)
-runtime: go
-entrypoint: ./func 
+name: my-python-function
+version: 0.0.18
+runtime: python
+build_image: fnproject/python:3.11-dev
+run_image: fnproject/python:3.11
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256

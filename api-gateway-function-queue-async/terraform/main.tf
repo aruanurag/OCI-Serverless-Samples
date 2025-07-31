@@ -17,6 +17,7 @@ locals {
       config       = merge(fn.config, {
         COMPARTMENT_ID = var.compartment_ocid
         OCI_REGION     = var.region
+        QUEUE_OCID     = module.queue.queue_id
       })
     }
   }
