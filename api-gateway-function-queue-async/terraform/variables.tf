@@ -19,14 +19,23 @@ variable "queue_name" {
   default     = "OrderQueue"
 }
 
-variable "container_repository_name" {
+variable "post_order_container_repository_name" {
   description = "Name of the OCI Container Repository"
   default     = "queue_async_repo"
+} 
+
+variable "process_order_container_repository_name" {
+  description = "Name of the OCI Container Repository"
+  default     = "process_order"
 } 
 
 variable "application_display_name" {
   description = "Name of function application"
   default     = "queue_async_app"
+}
+
+variable "nosql_table_name" {
+  default = "order_info"
 }
 
 variable "functions" {
@@ -45,3 +54,8 @@ variable "functions" {
     }
   }
 } 
+
+variable "queue_poller_image" {
+  type = string
+  default = null
+}

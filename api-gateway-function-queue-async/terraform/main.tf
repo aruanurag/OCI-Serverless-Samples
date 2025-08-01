@@ -23,6 +23,7 @@ locals {
   }
 }
 
+
 module "apigateway" {
   source         = "../../terraform/modules/apigateway"
   compartment_id = var.compartment_ocid
@@ -33,6 +34,25 @@ module "queue" {
   source         = "../../terraform/modules/queue"
   compartment_id = var.compartment_ocid
   queue_name     = var.queue_name
+}
+
+resource "oci_nosql_table" "order_info" {
+  compartment_id = var.compartment_ocid
+  name           = var.nosql_table_name
+  table_limits {
+    max_read_units = 50
+    max_write_units = 50
+    max_storage_in_gbs = 1
+  }
+  ddl_statement = <<DDL
+    CREATE TABLE ${var.nosql_table_name} (
+      order_id STRING,
+      customer_id STRING,
+      amount DOUBLE,
+      created_at STRING,
+      PRIMARY KEY (order_id)
+    )
+  DDL
 }
 
 resource "oci_functions_application" "queue_async_app" {
@@ -55,19 +75,6 @@ module "place_order_function" {
   function_config   = local.function_configs["place-order"].config
 }
 
-# module "process_order_function" {
-#   source            = "../../terraform/modules/functions"
-#   count             = var.functions["process-order"].source_image != null ? 1 : 0
-#   function_name     = "process-order"
-#   application_id    = oci_functions_application.customer_info_app.id
-#   path              = var.functions["process-order"].path
-#   source_image      = var.functions["process-order"].source_image
-#   compartment_id    = var.compartment_ocid
-#   region            = var.region
-#   apigw_id          = module.apigateway.gateway_id
-#   function_config   = var.functions["process-order"].config
-# }
-
 resource "oci_identity_policy" "function_queue_policy" {
   compartment_id = var.compartment_ocid
   description    = "Allows function applications to use queues"
@@ -87,5 +94,65 @@ resource "oci_identity_dynamic_group" "function_dynamic_group" {
 module "container_repository" {
   source                    = "../../terraform/modules/container_repository"
   compartment_id            = var.compartment_ocid
-  container_repository_name = var.container_repository_name
+  container_repository_name = var.post_order_container_repository_name
 } 
+
+module "container_repository_process_order" {
+  source                    = "../../terraform/modules/container_repository"
+  compartment_id            = var.compartment_ocid
+  container_repository_name = var.process_order_container_repository_name
+} 
+
+
+# Data source for availability domains
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.compartment_ocid
+}
+
+# Create Container Instance
+resource "oci_container_instances_container_instance" "poll_queue_instance" {
+  count              = var.queue_poller_image != null ? 1 : 0
+  compartment_id      = var.compartment_ocid
+  display_name        = "poll-queue-to-nosql"
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+  shape               = "CI.Standard.A1.Flex"
+  shape_config {
+    ocpus         = 1
+    memory_in_gbs = 6
+  }
+  vnics {
+    subnet_id = var.subnet_ocid
+    display_name = "poll-queue-vnic"
+  }
+  containers {
+    image_url = var.queue_poller_image
+    display_name = "queue-poller-container"
+    environment_variables = {
+      "QUEUE_OCID" = module.queue.queue_id
+      "TABLE_OCID" = oci_nosql_table.order_info.id
+      "OCI_REGION" = var.region
+    }
+    is_resource_principal_disabled = false
+  }
+  
+}
+
+# Create Dynamic Group
+resource "oci_identity_dynamic_group" "queue_nosql_dynamic_group" {
+  compartment_id = var.tenancy_ocid
+  name           = "QueueNoSQLContainerDynamicGroup"
+  description    = "Dynamic group for Container Instances polling OCI Queue and inserting into NoSQL table"
+  matching_rule  = "ALL {resource.type = 'containerinstance', resource.compartment.id = '${var.compartment_ocid}'}"
+}
+
+# Create IAM Policy
+resource "oci_identity_policy" "queue_nosql_policy" {
+  compartment_id = var.compartment_ocid
+  name           = "QueueNoSQLContainerPolicy"
+  description    = "Policy for Container Instances to access Queue and NoSQL"
+  statements = [
+    "allow dynamic-group QueueNoSQLContainerDynamicGroup to use queues in compartment id ${var.compartment_ocid}",
+    "allow dynamic-group QueueNoSQLContainerDynamicGroup to read queues in compartment id ${var.compartment_ocid}",
+    "allow dynamic-group QueueNoSQLContainerDynamicGroup to use nosql-family in compartment id ${var.compartment_ocid}"
+  ]
+}

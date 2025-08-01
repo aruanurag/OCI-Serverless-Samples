@@ -1,6 +1,0 @@
-schema_version: 20180708
-name: process-order
-version: 0.0.1
-description: Process orders from queue
-runtime: go
-entrypoint: ./func 
