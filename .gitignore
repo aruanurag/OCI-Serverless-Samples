@@ -1,9 +1,3 @@
-# Terraform
-OCI_Functions/terraform/.terraform/
-OCI_Functions/terraform/terraform.tfstate*
-OCI_Functions/terraform/.terraform*
-OCI_Functions/terraform/.terraform.lock.hcl
-
 # Go build  
 **/bin/
 **/vendor/
@@ -16,12 +10,9 @@ OCI_Functions/terraform/.terraform.lock.hcl
 .DS_Store 
 
 # Local Terraform variable overrides
-OCI_Functions/terraform/terraform_local.tfvars 
 **/.terraform.lock.hcl 
 **/terraform_local.tfvars  
 **/.terraform*
-api-gateway-function-nosql-table/terraform/terraform.tfstate.backup
 
-api-gateway-function-nosql-table/terraform/terraform.tfstate
-api-gateway-function-queue-async/terraform/terraform.tfstate.backup
-api-gateway-function-queue-async/terraform/terraform.tfstate
+*.tfstate
+*.tfstate.backup

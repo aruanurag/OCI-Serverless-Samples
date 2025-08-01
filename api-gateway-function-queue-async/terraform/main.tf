@@ -142,7 +142,14 @@ resource "oci_identity_dynamic_group" "queue_nosql_dynamic_group" {
   compartment_id = var.tenancy_ocid
   name           = "QueueNoSQLContainerDynamicGroup"
   description    = "Dynamic group for Container Instances polling OCI Queue and inserting into NoSQL table"
-  matching_rule  = "ALL {resource.type = 'containerinstance', resource.compartment.id = '${var.compartment_ocid}'}"
+  matching_rule  = "ALL {resource.type = 'computecontainerinstance', resource.compartment.id = '${var.compartment_ocid}'}"
+}
+
+resource "oci_identity_dynamic_group" "apigw_dynamic_group" {
+  compartment_id = var.tenancy_ocid
+  description    = "Dynamic group containing all API Gateways in compartment ${var.compartment_ocid}"
+  matching_rule  = "ALL {resource.type = 'ApiGateway', resource.compartment.id = '${var.compartment_ocid}'}"
+  name           = "apigw_dynamic_group"
 }
 
 # Create IAM Policy
@@ -153,6 +160,8 @@ resource "oci_identity_policy" "queue_nosql_policy" {
   statements = [
     "allow dynamic-group QueueNoSQLContainerDynamicGroup to use queues in compartment id ${var.compartment_ocid}",
     "allow dynamic-group QueueNoSQLContainerDynamicGroup to read queues in compartment id ${var.compartment_ocid}",
-    "allow dynamic-group QueueNoSQLContainerDynamicGroup to use nosql-family in compartment id ${var.compartment_ocid}"
+    "allow dynamic-group QueueNoSQLContainerDynamicGroup to use nosql-family in compartment id ${var.compartment_ocid}",
+    "allow dynamic-group QueueNoSQLContainerDynamicGroup to read repos in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group apigw_dynamic_group to use functions-family in compartment id ${var.compartment_ocid}"
   ]
 }
