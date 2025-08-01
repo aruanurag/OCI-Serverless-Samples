@@ -29,7 +29,7 @@ functions/
    ```sh
    cd terraform
    ```
-2. **(Optional) Edit `terraform.tfvars`** to provide your actual OCIDs and configuration values.
+2. **Edit `terraform.tfvars`** to provide your actual OCIDs and configuration values.
 3. **Initialize Terraform:**
    ```sh
    terraform init
