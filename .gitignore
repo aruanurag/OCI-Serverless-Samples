@@ -16,3 +16,4 @@
 
 *.tfstate
 *.tfstate.backup
+**/__pycache__/
