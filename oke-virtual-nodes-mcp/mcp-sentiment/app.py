@@ -30,7 +30,7 @@ demo = gr.Interface(
     inputs=gr.Textbox(placeholder="Enter text to analyze..."),
     outputs=gr.Textbox(),  # Changed from gr.JSON() to gr.Textbox()
     title="Text Sentiment Analysis",
-    description="Analyze the sentiment of text using TextBlob"
+    description="Analyze the sentiment of text using OCI AI Language Service"
 )
 
 # Launch the interface and MCP server
