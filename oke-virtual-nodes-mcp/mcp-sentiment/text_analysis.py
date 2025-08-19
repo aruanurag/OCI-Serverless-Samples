@@ -1,5 +1,6 @@
 import oci
 import logging
+import os
 from oci.ai_language.models import TextDocument, BatchDetectLanguageSentimentsDetails, BatchDetectLanguageKeyPhrasesDetails
 from oci.retry import DEFAULT_RETRY_STRATEGY
 
@@ -10,14 +11,14 @@ logger = logging.getLogger(__name__)
 def analyze_text(text: str) -> dict:
     logger.info(f"Starting text analysis for input: {text[:50]}...")  # Log first 50 chars
     try:
-        logger.debug("Loading OCI configuration")
-        config = oci.config.from_file()
-        config["connection_timeout"] = 10.0
-        config["read_timeout"] = 120.0
-        logger.debug(f"OCI config loaded: {config.get('region')}")
-
+        logger.debug("Loading OCI signer")
+         # Initialize Resource Principal signer
+        signer = oci.auth.signers.get_oke_workload_identity_resource_principal_signer()      
+        region = os.environ.get("OCI_REGION", "us-ashburn-1")
         logger.debug("Initializing AI Language client")
-        ai_client = oci.ai_language.AIServiceLanguageClient(config)
+        ai_client = oci.ai_language.AIServiceLanguageClient(
+            config={"region": region},
+            signer=signer)
         
         logger.debug("Preparing text document")
         text_document = TextDocument(key="input_text", text=text, language_code="en")

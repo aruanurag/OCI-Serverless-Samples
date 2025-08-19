@@ -1,6 +1,18 @@
-import json
-import gradio as gr
+import os
+from fastmcp import FastMCP
 from text_analysis import analyze_text
+import json
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse
+
+APP_NAME = os.getenv("FASTMCP_APP_NAME", "fastmcp-demo")
+PORT = int(os.getenv("FASTMCP_PORT", "8080"))
+HOST = os.getenv("FASTMCP_HOST", "0.0.0.0")
+
+
+mcp = FastMCP(APP_NAME)
+
+@mcp.tool
 def sentiment_analysis(text: str) -> str:
     """
     Analyze the sentiment of the given text.
@@ -23,15 +35,13 @@ def sentiment_analysis(text: str) -> str:
 
     return json.dumps(result)
 
-# Create the Gradio interface
-demo = gr.Interface(
-    fn=sentiment_analysis,
-    inputs=gr.Textbox(placeholder="Enter text to analyze..."),
-    outputs=gr.Textbox(),  # Changed from gr.JSON() to gr.Textbox()
-    title="Text Sentiment Analysis",
-    description="Analyze the sentiment of text using OCI AI Language Service"
-)
+# Health endpoint for k8s probes
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> PlainTextResponse:
+    return PlainTextResponse("OK")
 
-# Launch the interface and MCP server
+
 if __name__ == "__main__":
-    demo.launch(mcp_server=True)
+    # Expose Streamable HTTP transport so clients can connect over the network.
+    # MCP endpoint will be available at http://<host>:<port>/mcp/
+    mcp.run(transport="http", host=HOST, port=PORT)

@@ -25,7 +25,7 @@ client = MultiServerMCPClient(
     {
         "tools_server": {
             "transport": "streamable_http",
-            "url": "http://127.0.0.1:7860/gradio_api/mcp/",
+            "url": "http://129.80.32.149:80/mcp/",
         },
     }
 )
