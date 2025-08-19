@@ -36,9 +36,11 @@ spec:
         app: fastmcp-server
     spec:
       serviceAccountName: fastmcp-server-sa
+      imagePullSecrets:
+        - name: ocirsecret
       containers:
         - name: fastmcp-server
-          image: iad.ocir.io/idrvpjvdnx7h/test_mcp:0.1.7
+          image: iad.ocir.io/idrvpjvdnx7h/mcp-sentiment-tool-repo:0.0.1
           envFrom:
             - configMapRef:
                 name: mcp-config
