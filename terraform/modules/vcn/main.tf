@@ -32,7 +32,7 @@ resource "oci_core_service_gateway" "this" {
   display_name   = "${var.vcn_name}_service_gateway"
   # This fetches the specific service object needed for the gateway
   services {
-    service_id = data.oci_core_services.all_services.services[0].id #"All ${upper(data.oci_identity_regions.current.regions[0].key)} Services in Oracle Services Network"
+    service_id = data.oci_core_services.all_services.services[0].id
   }
 }
 
