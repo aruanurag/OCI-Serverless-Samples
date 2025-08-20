@@ -3,8 +3,8 @@ resource "oci_nosql_table" "customer_info" {
   compartment_id = var.compartment_id
   name           = var.nosql_table_name
   table_limits {
-    max_read_units = 50
-    max_write_units = 50
+    max_read_units     = 50
+    max_write_units    = 50
     max_storage_in_gbs = 1
   }
   ddl_statement = <<DDL

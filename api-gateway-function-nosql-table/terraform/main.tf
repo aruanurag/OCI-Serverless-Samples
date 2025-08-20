@@ -10,10 +10,10 @@ terraform {
 provider "oci" {}
 
 locals {
-  function_configs = {      
-      COMPARTMENT_ID = var.compartment_ocid
-      OCI_REGION     = var.region
-      NOSQL_TABLE_NAME = var.nosql_table_name
+  function_configs = {
+    COMPARTMENT_ID   = var.compartment_ocid
+    OCI_REGION       = var.region
+    NOSQL_TABLE_NAME = var.nosql_table_name
   }
 }
 
@@ -37,24 +37,24 @@ resource "oci_functions_application" "customer_info_app" {
 }
 
 module "functions" {
-  source            = "../../terraform/modules/functions"
-  for_each          = { for name, f in var.functions : name => f if f.source_image != null }
-  function_name     = each.key
-  application_id    = oci_functions_application.customer_info_app.id  
-  path              = each.value.path
-  source_image      = each.value.source_image
-  compartment_id    = var.compartment_ocid
-  region            = var.region
-  apigw_id          = module.apigateway.gateway_id
-  function_config   = local.function_configs
-  
+  source          = "../../terraform/modules/functions"
+  for_each        = { for name, f in var.functions : name => f if f.source_image != null }
+  function_name   = each.key
+  application_id  = oci_functions_application.customer_info_app.id
+  path            = each.value.path
+  source_image    = each.value.source_image
+  compartment_id  = var.compartment_ocid
+  region          = var.region
+  apigw_id        = module.apigateway.gateway_id
+  function_config = local.function_configs
+
 }
 
 resource "oci_identity_policy" "function_nosql_policy" {
   compartment_id = var.compartment_ocid
   description    = "Allows function applications to use NoSQL tables in compartment ${var.compartment_ocid}"
   name           = "function_nosql_access"
-  statements     = [
+  statements = [
     "Allow dynamic-group function_dynamic_group to manage nosql-family in compartment id ${var.compartment_ocid}"
   ]
 }
@@ -63,7 +63,7 @@ resource "oci_identity_policy" "apigw_function_policy" {
   compartment_id = var.compartment_ocid
   description    = "Allows API Gateways to use functions in compartment ${var.compartment_ocid}"
   name           = "apigw_function_access"
-  statements     = [
+  statements = [
     "Allow dynamic-group apigw_dynamic_group to manage functions-family in compartment id ${var.compartment_ocid}"
   ]
 }

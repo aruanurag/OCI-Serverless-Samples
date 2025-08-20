@@ -3,7 +3,7 @@ resource "oci_functions_function" "fn" {
   application_id = var.application_id
   image          = var.source_image
   memory_in_mbs  = 128
-  config = var.function_config
+  config         = var.function_config
 }
 
 resource "oci_apigateway_deployment" "customer_info" {
@@ -14,7 +14,7 @@ resource "oci_apigateway_deployment" "customer_info" {
 
   specification {
     routes {
-      path   = var.path
+      path    = var.path
       methods = ["GET", "POST"]
       backend {
         type        = "ORACLE_FUNCTIONS_BACKEND"

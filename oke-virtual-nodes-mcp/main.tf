@@ -1,26 +1,31 @@
-# Main Terraform configuration to provision OKE cluster with virtual nodes
+# main.tf
 
-# Provider configuration
-provider "oci" {
+# Configure the Oracle Cloud Infrastructure provider
+provider "oci" {}
+
+# Get a list of availability domains in the region
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.tenancy_ocid
 }
 
+# ------------ OKE Cluster Configuration ------------
 
-# Module reference for OKE virtual nodes
+# Create the OKE Cluster (Control Plane)
 module "oke_virtual_nodes" {
-  source                   = "../terraform/modules/oke-virtual-nodes"
-  tenancy_ocid             = var.tenancy_ocid
-  compartment_ocid         = var.compartment_ocid
-  region                   = var.region
-  vcn_id                   = var.vcn_id
-  control_plane_subnet_id  = var.control_plane_subnet_id
-  load_balancer_subnet_id  = var.load_balancer_subnet_id
-  virtual_nodes_subnet_id  = var.virtual_nodes_subnet_id
-  cluster_name             = var.cluster_name
-  kubernetes_version       = var.kubernetes_version
+  source                  = "../terraform/modules/oke-virtual-nodes"
+  tenancy_ocid            = var.tenancy_ocid
+  compartment_ocid        = var.compartment_id
+  region                  = var.region
+  vcn_id                  = module.network.vcn_id
+  control_plane_subnet_id = module.network.subnets["control_plane"].id
+  virtual_nodes_subnet_id = module.network.subnets["data_plane"].id
+  load_balancer_subnet_id = module.network.subnets["load_balancer"].id
+  kubernetes_version      = var.kubernetes_version
+  cluster_name            = var.cluster_name
+  api_endpoint_nsg_ids    = [oci_core_network_security_group.oke_api_endpoint_nsg.id]
 }
 
 resource "oci_identity_policy" "mcp_workload_policy" {
-  # Replace with your tenancy OCID
   compartment_id = var.tenancy_ocid  
 
   name        = "mcp-workload-policy"
@@ -40,15 +45,6 @@ EOT
 
 module "container_repository" {
   source                    = "../terraform/modules/container_repository"
-  compartment_id            = var.compartment_ocid
+  compartment_id            = var.compartment_id
   container_repository_name = var.mcp_container_repository_name
 } 
-
-# Outputs
-output "cluster_id" {
-  value = module.oke_virtual_nodes.cluster_id
-}
-
-output "virtual_node_pool_id" {
-  value = module.oke_virtual_nodes.virtual_node_pool_id
-}
