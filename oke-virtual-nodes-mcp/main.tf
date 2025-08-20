@@ -19,6 +19,31 @@ module "oke_virtual_nodes" {
   kubernetes_version       = var.kubernetes_version
 }
 
+resource "oci_identity_policy" "mcp_workload_policy" {
+  # Replace with your tenancy OCID
+  compartment_id = var.tenancy_ocid  
+
+  name        = "mcp-workload-policy"
+  description = "Allow OKE workload identity (fastmcp-server-sa in mcp namespace) to manage resources"
+
+  statements = [
+    <<EOT
+Allow any-user to manage all-resources in tenancy where all {
+  request.principal.type = workload,
+  request.principal.namespace = mcp,
+  request.principal.service_account = fastmcp-server-sa,
+  request.principal.cluster_id = ${module.oke_virtual_nodes.cluster_id}
+}
+EOT
+  ]
+}
+
+module "container_repository" {
+  source                    = "../terraform/modules/container_repository"
+  compartment_id            = var.compartment_ocid
+  container_repository_name = var.mcp_container_repository_name
+} 
+
 # Outputs
 output "cluster_id" {
   value = module.oke_virtual_nodes.cluster_id

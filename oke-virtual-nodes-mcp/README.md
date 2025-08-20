@@ -1,0 +1,1 @@
+kubectl create secret docker-registry ocirsecret --docker-server=iad.ocir.io --docker-username=dkfhsdkfhs/john.doe@abc.com  --docker-password='v}sdfdf}#FlW60d' --docker-email=jdoe@acme.com -n mcp --dry-run=client -o yaml > k8s/secret.yaml

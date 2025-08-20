@@ -8,3 +8,4 @@ variable "load_balancer_subnet_id" {}
 variable "virtual_nodes_subnet_id" {}
 variable "cluster_name" {}
 variable "kubernetes_version" {}
+variable "mcp_container_repository_name" {}
