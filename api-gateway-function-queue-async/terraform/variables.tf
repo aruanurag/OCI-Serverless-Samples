@@ -22,12 +22,12 @@ variable "queue_name" {
 variable "post_order_container_repository_name" {
   description = "Name of the OCI Container Repository"
   default     = "queue_async_repo"
-} 
+}
 
 variable "process_order_container_repository_name" {
   description = "Name of the OCI Container Repository"
   default     = "process_order"
-} 
+}
 
 variable "application_display_name" {
   description = "Name of function application"
@@ -42,20 +42,20 @@ variable "functions" {
   description = "A map of function configurations. The key is the function name."
   type = map(object({
     source_image = optional(string, null)
-    path = optional(string, null)
-    config = map(string)
+    path         = optional(string, null)
+    config       = map(string)
   }))
   default = {
     "place-order" = {
       # This function will be SKIPPED because its source_image is null.
       source_image = null #Change this to image name after uploading image to OCIR
-      path = "/order"
-      config = {}
+      path         = "/order"
+      config       = {}
     }
   }
-} 
+}
 
 variable "queue_poller_image" {
-  type = string
+  type    = string
   default = null
 }

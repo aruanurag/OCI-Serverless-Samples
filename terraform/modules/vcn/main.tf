@@ -32,7 +32,7 @@ resource "oci_core_service_gateway" "this" {
   display_name   = "${var.vcn_name}_service_gateway"
   # This fetches the specific service object needed for the gateway
   services {
-     service_id = data.oci_core_services.all_services.services[0].id #"All ${upper(data.oci_identity_regions.current.regions[0].key)} Services in Oracle Services Network"
+    service_id = data.oci_core_services.all_services.services[0].id #"All ${upper(data.oci_identity_regions.current.regions[0].key)} Services in Oracle Services Network"
   }
 }
 
@@ -71,7 +71,7 @@ resource "oci_core_security_list" "this" {
     protocol    = "all"
     destination = "0.0.0.0/0"
   }
-  
+
   # # Example: Allow ingress SSH only on public subnets
   # dynamic "ingress_security_rules" {
   #   for_each = each.value.is_public ? [1] : []
@@ -88,13 +88,13 @@ resource "oci_core_security_list" "this" {
 
 # Create a public subnet
 resource "oci_core_subnet" "this" {
-  for_each            = var.subnets
-  compartment_id      = var.compartment_id
-  vcn_id              = oci_core_vcn.this.id
-  display_name        = "${var.vcn_name}_subnet_${each.key}"
-  dns_label           = each.value.dns_label
-  cidr_block          = each.value.cidr_block
-  security_list_ids   = [oci_core_security_list.this[each.key].id]
-  route_table_id      = oci_core_route_table.this[each.key].id
+  for_each                   = var.subnets
+  compartment_id             = var.compartment_id
+  vcn_id                     = oci_core_vcn.this.id
+  display_name               = "${var.vcn_name}_subnet_${each.key}"
+  dns_label                  = each.value.dns_label
+  cidr_block                 = each.value.cidr_block
+  security_list_ids          = [oci_core_security_list.this[each.key].id]
+  route_table_id             = oci_core_route_table.this[each.key].id
   prohibit_public_ip_on_vnic = !each.value.is_public
 }

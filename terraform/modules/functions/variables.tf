@@ -34,7 +34,7 @@ variable "apigw_id" {
   description = "The OCID of the API Gateway."
   type        = string
   default     = null
-} 
+}
 
 variable "function_config" {
   type = map(string)

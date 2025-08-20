@@ -6,4 +6,4 @@ variable "compartment_id" {
 variable "subnet_id" {
   description = "The OCID of the subnet."
   type        = string
-} 
+}

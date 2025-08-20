@@ -5,10 +5,10 @@
 module "network" {
   source = "../terraform/modules/vcn"
 
-  compartment_id     = var.compartment_id
-  region             = var.region
-  vcn_cidr           = "10.0.0.0/16"
-  create_nat_gateway = true # We need this for the private subnet
+  compartment_id         = var.compartment_id
+  region                 = var.region
+  vcn_cidr               = "10.0.0.0/16"
+  create_nat_gateway     = true # We need this for the private subnet
   create_service_gateway = true
 
   subnets = {
@@ -18,9 +18,9 @@ module "network" {
       dns_label  = "control"
     },
     "data_plane" = {
-      cidr_block = "10.0.10.0/19"
-      is_public  = false
-      dns_label  = "data"
+      cidr_block          = "10.0.10.0/19"
+      is_public           = false
+      dns_label           = "data"
       use_service_gateway = true
     },
     "load_balancer" = {
