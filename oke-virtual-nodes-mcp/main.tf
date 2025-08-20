@@ -45,6 +45,6 @@ EOT
 
 module "container_repository" {
   source                    = "../terraform/modules/container_repository"
-  compartment_id            = var.compartment_ocid
+  compartment_id            = var.compartment_id
   container_repository_name = var.mcp_container_repository_name
 } 
