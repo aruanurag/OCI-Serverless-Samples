@@ -1,9 +1,5 @@
-tenancy_ocid             = "ocid1.tenancy.oc1..."
-compartment_ocid         = "ocid1.tenancy.oc1..."
-region                   = ""
-vcn_id                   = "ocid1.vcn.oc1..."
-control_plane_subnet_id  = "ocid1.subnet.oc1..."
-load_balancer_subnet_id  = "ocid1.subnet.oc1..."
-virtual_nodes_subnet_id  = "ocid1.subnet.oc1..."
-cluster_name             = "my-oke-cluster"
-kubernetes_version       = "v1.33.1"
+# terraform.tfvars
+
+tenancy_ocid     = "ocid1.tenancy.oc1..your_tenancy_ocid"
+compartment_id   = "ocid1.compartment.oc1..your_compartment_ocid"
+region           = "us-ashburn-1" # Or your desired region
