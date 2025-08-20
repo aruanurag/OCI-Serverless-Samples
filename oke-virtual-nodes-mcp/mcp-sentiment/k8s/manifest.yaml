@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mcp
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fastmcp-server-sa
+  namespace: mcp
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp-config
+  namespace: mcp
+data:
+  APP_NAME: "fastmcp-demo"
+  PORT: "8080"
+  HOST: "0.0.0.0"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastmcp-server
+  namespace: mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastmcp-server
+  template:
+    metadata:
+      labels:
+        app: fastmcp-server
+    spec:
+      serviceAccountName: fastmcp-server-sa
+      imagePullSecrets:
+        - name: ocirsecret
+      containers:
+        - name: fastmcp-server
+          image: iad.ocir.io/idrvpjvdnx7h/mcp-sentiment-tool-repo:0.0.1
+          envFrom:
+            - configMapRef:
+                name: mcp-config
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastmcp-server
+  namespace: mcp
+spec:
+  selector:
+    app: fastmcp-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  type: LoadBalancer
+---
