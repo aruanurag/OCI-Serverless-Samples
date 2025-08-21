@@ -1,6 +1,3 @@
-# Configure the Oracle Cloud Infrastructure provider
-provider "oci" {}
-
 # Get a list of availability domains in the region
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
