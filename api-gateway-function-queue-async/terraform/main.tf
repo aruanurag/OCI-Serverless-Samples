@@ -103,12 +103,6 @@ module "container_repository_process_order" {
   container_repository_name = var.process_order_container_repository_name
 }
 
-
-# Data source for availability domains
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.compartment_ocid
-}
-
 # Create Container Instance
 resource "oci_container_instances_container_instance" "poll_queue_instance" {
   count               = var.queue_poller_image != null ? 1 : 0
