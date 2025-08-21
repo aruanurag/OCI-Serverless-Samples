@@ -8,6 +8,10 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
 
+data "oci_identity_region_subscriptions" "this" {
+  tenancy_id = var.tenancy_ocid
+}
+
 # ------------ OKE Cluster Configuration ------------
 
 # Create the OKE Cluster (Control Plane)
@@ -22,7 +26,7 @@ module "oke_virtual_nodes" {
   load_balancer_subnet_id = module.network.subnets["load_balancer"].id
   kubernetes_version      = var.kubernetes_version
   cluster_name            = var.cluster_name
-  api_endpoint_nsg_ids    = [oci_core_network_security_group.oke_api_endpoint_nsg.id]
+  # api_endpoint_nsg_ids    = [oci_core_network_security_group.oke_api_endpoint_nsg.id]
 }
 
 resource "oci_identity_policy" "mcp_workload_policy" {
