@@ -26,3 +26,18 @@ variable "cluster_name" {
   description = "The name of the OKE cluster."
   default     = "oke-cluster"
 }
+
+variable "control_subnet_cidr_block" {
+  description = "The CIDR block for the control subnet."
+  default     = "10.0.0.0/28"
+}
+
+variable "data_subnet_cidr_block" {
+  description = "The CIDR block for the data subnet."
+  default     = "10.0.16.0/20"
+}
+
+variable "load_balancer_subnet_cidr_block" {
+  description = "The CIDR block for the public subnet."
+  default     = "10.0.32.0/24"
+}

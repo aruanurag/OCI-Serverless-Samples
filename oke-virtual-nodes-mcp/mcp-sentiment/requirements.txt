@@ -1,5 +1,4 @@
 oci==2.133.0
-gradio[mcp]>=4.44.1
 mcp>=1.8.1
 fastmcp==2.*
 uvicorn>=0.30

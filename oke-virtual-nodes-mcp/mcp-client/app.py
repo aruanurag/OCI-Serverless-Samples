@@ -11,9 +11,9 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 
 # Initialize LLM
 llm = ChatOCIGenAI(
-    model_id="ocid1.generativeaimodel.oc1.us-chicago-1.amaaaaaask7dceyapnibwg42qjhwaxrlqfpreueirtwghiwvv2whsnwmnlva",
+    model_id="<Your model OCID>",
     service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
-    compartment_id="ocid1.tenancy.oc1..aaaaaaaa3ocohl2rfeixo3ikcbfeq4iveaysj5dfv2uo3kgnidowlifw6aiq",
+    compartment_id="<Your compartment OCID>",
     model_kwargs={"temperature": 0.7, "max_tokens": 500},
     auth_type="API_KEY",
     auth_profile="DEFAULT",
@@ -25,7 +25,7 @@ client = MultiServerMCPClient(
     {
         "tools_server": {
             "transport": "streamable_http",
-            "url": "http://129.80.32.149:80/mcp/",
+            "url": "<Your IP>:80/mcp/",
         },
     }
 )

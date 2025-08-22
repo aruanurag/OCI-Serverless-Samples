@@ -40,7 +40,7 @@ spec:
         - name: ocirsecret
       containers:
         - name: fastmcp-server
-          image: iad.ocir.io/idrvpjvdnx7h/mcp-sentiment-tool-repo:0.0.1
+          image: <Your image tag>
           envFrom:
             - configMapRef:
                 name: mcp-config

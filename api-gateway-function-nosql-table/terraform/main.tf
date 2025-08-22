@@ -1,14 +1,3 @@
-terraform {
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "= 7.9.0"
-    }
-  }
-}
-
-provider "oci" {}
-
 locals {
   function_configs = {
     COMPARTMENT_ID   = var.compartment_ocid
@@ -86,4 +75,4 @@ module "container_repository" {
   source                    = "../../terraform/modules/container_repository"
   compartment_id            = var.compartment_ocid
   container_repository_name = var.container_repository_name
-} 
+}

@@ -60,31 +60,63 @@ resource "oci_core_route_table" "this" {
   }
 }
 
-# Create a Security List with basic ingress/egress rules
-resource "oci_core_security_list" "this" {
-  for_each       = var.subnets
+resource "oci_core_security_list" "custom" {
+  for_each = var.security_lists
+
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.this.id
   display_name   = "${var.vcn_name}_sl_${each.key}"
 
-  egress_security_rules {
-    protocol    = "all"
-    destination = "0.0.0.0/0"
+  dynamic "ingress_security_rules" {
+    for_each = each.value.ingress_rules
+    content {
+      protocol = ingress_security_rules.value.protocol
+      source   = ingress_security_rules.value.source
+
+      dynamic "tcp_options" {
+        for_each = ingress_security_rules.value.protocol == "6" && ingress_security_rules.value.tcp_min != null ? [1] : []
+        content {
+          min = ingress_security_rules.value.tcp_min
+          max = ingress_security_rules.value.tcp_max
+        }
+      }
+
+      dynamic "icmp_options" {
+        for_each = ingress_security_rules.value.protocol == "1" ? [1] : []
+        content {
+          type = ingress_security_rules.value.icmp_type
+          code = ingress_security_rules.value.icmp_code
+        }
+      }
+    }
   }
 
-  # # Example: Allow ingress SSH only on public subnets
-  # dynamic "ingress_security_rules" {
-  #   for_each = each.value.is_public ? [1] : []
-  #   content {
-  #     protocol = "6" # TCP
-  #     source   = "0.0.0.0/0"
-  #     tcp_options {
-  #       min = 22
-  #       max = 22
-  #     }
-  #   }
-  # }
+  dynamic "egress_security_rules" {
+    for_each = each.value.egress_rules
+    content {
+      protocol    = egress_security_rules.value.protocol
+      destination = egress_security_rules.value.destination
+      destination_type = lookup(egress_security_rules.value, "dest_type", "CIDR_BLOCK")
+
+      dynamic "tcp_options" {
+        for_each = egress_security_rules.value.protocol == "6" && egress_security_rules.value.tcp_min != null ? [1] : []
+        content {
+          min = egress_security_rules.value.tcp_min
+          max = egress_security_rules.value.tcp_max
+        }
+      }
+
+      dynamic "icmp_options" {
+        for_each = egress_security_rules.value.protocol == "1" ? [1] : []
+        content {
+          type = egress_security_rules.value.icmp_type
+          code = egress_security_rules.value.icmp_code
+        }
+      }
+    }
+  }
 }
+
 
 # Create a public subnet
 resource "oci_core_subnet" "this" {
@@ -94,7 +126,13 @@ resource "oci_core_subnet" "this" {
   display_name               = "${var.vcn_name}_subnet_${each.key}"
   dns_label                  = each.value.dns_label
   cidr_block                 = each.value.cidr_block
-  security_list_ids          = [oci_core_security_list.this[each.key].id]
+  
+  security_list_ids = [
+    lookup(oci_core_security_list.custom, each.key, null) != null
+      ? oci_core_security_list.custom[each.key].id
+      : null
+  ]
+
   route_table_id             = oci_core_route_table.this[each.key].id
   prohibit_public_ip_on_vnic = !each.value.is_public
 }

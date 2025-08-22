@@ -12,9 +12,9 @@ from langchain_community.chat_models.oci_generative_ai import ChatOCIGenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 llm = ChatOCIGenAI(
-            model_id="ocid1.generativeaimodel.oc1.us-chicago-1.amaaaaaask7dceyapnibwg42qjhwaxrlqfpreueirtwghiwvv2whsnwmnlva",  # Replace with your model ID
+            model_id="<Your model OCID>",
             service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",  # Replace with your endpoint
-            compartment_id="ocid1.tenancy.oc1..aaaaaaaa3ocohl2rfeixo3ikcbfeq4iveaysj5dfv2uo3kgnidowlifw6aiq",  # Replace with your OCI compartment OCID
+            compartment_id="<Your compartment OCID>",
             model_kwargs={"temperature": 0.7, "max_tokens": 500},
             auth_type="API_KEY",
             auth_profile="DEFAULT",
@@ -30,7 +30,7 @@ client = MultiServerMCPClient(
     {
         "tools_server": {
             "transport": "streamable_http",
-            "url": "http://129.80.32.149:80/mcp/" #http://127.0.0.1:7860/gradio_api/mcp/",  # Replace with your MCP server URL
+            "url": "http://<Your MCP Server IP>:80/mcp/" #http://127.0.0.1:7860/gradio_api/mcp/",  # Replace with your MCP server URL
         },
     }
 )

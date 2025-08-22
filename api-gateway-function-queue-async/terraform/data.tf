@@ -9,4 +9,9 @@ data "oci_identity_regions" "current" {
   }
 }
 
+# Data source for availability domains
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.compartment_ocid
+}
+
 data "oci_objectstorage_namespace" "this" {}
