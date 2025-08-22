@@ -17,3 +17,4 @@
 *.tfstate
 *.tfstate.backup
 **/__pycache__/
+oke-virtual-nodes-mcp/mcp-client/agent_client.log
