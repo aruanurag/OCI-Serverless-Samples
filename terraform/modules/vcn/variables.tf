@@ -54,3 +54,27 @@ variable "vcn_dns_label" {
   type        = string
   default     = "modvcn"
 }
+
+variable "security_lists" {
+  description = "Map of security lists keyed by subnet name."
+  type = map(object({
+    ingress_rules = list(object({
+      protocol = string
+      source   = string
+      tcp_min  = optional(number)
+      tcp_max  = optional(number)
+      icmp_type = optional(number)
+      icmp_code = optional(number)
+    }))
+    egress_rules = list(object({
+      protocol = string
+      destination = string
+      dest_type   = optional(string, "CIDR_BLOCK")
+      tcp_min  = optional(number)
+      tcp_max  = optional(number)
+      icmp_type = optional(number)
+      icmp_code = optional(number)
+    }))
+  }))
+  default = {}
+}
