@@ -35,6 +35,21 @@ def sentiment_analysis(text: str) -> str:
 
     return json.dumps(result)
 
+@mcp.tool
+def get_weather(text: str) -> str:
+    """
+    Get the current weather of the given city.
+
+    Args:
+        text (str): The name of the city
+
+    Returns:
+        str: The city and weather
+    """
+    result = {"weather": "sunny",
+              "city": text}
+    return json.dumps(result)
+
 # Health endpoint for k8s probes
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> PlainTextResponse:

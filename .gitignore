@@ -9,6 +9,9 @@
 .vscode/
 .DS_Store 
 
+# Debug
+*.log
+
 # Local Terraform variable overrides
 **/.terraform.lock.hcl 
 **/terraform_local.tfvars  

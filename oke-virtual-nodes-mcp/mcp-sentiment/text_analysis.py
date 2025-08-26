@@ -18,7 +18,8 @@ def analyze_text(text: str) -> dict:
         logger.debug("Initializing AI Language client")
         ai_client = oci.ai_language.AIServiceLanguageClient(
             config={"region": region},
-            signer=signer)
+            signer=signer
+        )
         
         logger.debug("Preparing text document")
         text_document = TextDocument(key="input_text", text=text, language_code="en")
