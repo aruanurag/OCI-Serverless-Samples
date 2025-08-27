@@ -12,9 +12,9 @@ rm -rf /var/lib/apt/lists/*
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY mcp_server.py ./
-COPY text_analysis.py ./
+COPY app.py ./
+COPY tools/ ./tools/
 # Default port
 ENV FASTMCP_PORT=8080 FASTMCP_HOST=0.0.0.0 FASTMCP_APP_NAME=fastmcp-demo
 # Run the HTTP transport
-CMD ["python", "mcp_server.py"]
+CMD ["python", "app.py"]

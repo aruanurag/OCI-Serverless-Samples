@@ -1,8 +1,8 @@
 import os
 from fastmcp import FastMCP
-from text_analysis import analyze_text
-from classify_document import classify_document
-from nosql_client import upload_sentiment_result, query_sentiment_results
+from tools.text_analysis import analyze_text
+from tools.classify_document import classify_document
+from tools.nosql_client import upload_sentiment_result, query_sentiment_results
 import json
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
@@ -38,7 +38,6 @@ def sentiment_analysis(text: str) -> str:
     return json.dumps(result)
 
 @mcp.tool
-<<<<<<< HEAD
 def document_classification(file_path: str) -> str:
     """
     Classify the given document.
@@ -164,7 +163,7 @@ def analyze_and_store_sentiment(text: str, user_id: str = None, session_id: str 
         }
         return json.dumps(error_result)
 
-=======
+
 def get_weather(text: str) -> str:
     """
     Get the current weather of the given city.
@@ -179,7 +178,7 @@ def get_weather(text: str) -> str:
               "city": text}
     return json.dumps(result)
 
->>>>>>> 9166939ff73ddb7ba86fdb5b275cf4810c08b7b6
+
 # Health endpoint for k8s probes
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> PlainTextResponse:
