@@ -44,6 +44,7 @@ def analyze_text(text: str) -> dict:
             )
         )
         logger.debug(f"Text classification received: {text_classification.data}")
+               
         
         logger.debug("Performing key phrase extraction")
         key_phrase_details = BatchDetectLanguageKeyPhrasesDetails(documents=[text_document])

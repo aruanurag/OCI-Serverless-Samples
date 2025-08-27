@@ -1,6 +1,9 @@
+# agent_client.py
+import os
 import gradio as gr
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from dotenv import load_dotenv
 import asyncio
 import logging
 from langchain_mcp_adapters.tools import load_mcp_tools
@@ -21,15 +24,19 @@ logger = logging.getLogger(__name__)
 
 # Initialize LLM
 logger.info("Initializing OCI Generative AI model")
+load_dotenv()
 try:
     llm = ChatOCIGenAI(
-        model_id="cohere.command-latest",
-        service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
-        compartment_id="<compartment ocid>",
-        model_kwargs={"temperature": 0.7, "max_tokens": 500},
-        auth_type="API_KEY",
-        auth_profile="DEFAULT",
-        provider="cohere"
+        model_id=os.getenv("MODEL_ID"),
+        service_endpoint=os.getenv("SERVICE_ENDPOINT"),
+        compartment_id=os.getenv("COMPARTMENT_ID"),
+        model_kwargs={
+            "temperature": float(os.getenv("MODEL_TEMPERATURE")),
+            "max_tokens": int(os.getenv("MODEL_MAX_TOKENS"))
+        },
+        auth_type=os.getenv("AUTH_TYPE"),
+        auth_profile=os.getenv("AUTH_PROFILE"),
+        provider=os.getenv("PROVIDER"),
     )
     logger.info("LLM initialized successfully")
 except Exception as e:
@@ -39,11 +46,12 @@ except Exception as e:
 # Initialize client
 logger.info("Initializing MultiServerMCPClient")
 try:
+    mcp_url = os.getenv("MCP_URL")
     client = MultiServerMCPClient(
         {
             "tools_server": {
                 "transport": "streamable_http",
-                "url": "http://0.0.0.0:8080/mcp/",
+                "url": mcp_url,
                 "timeout": 30.0,
             },
         }
@@ -56,26 +64,37 @@ except Exception as e:
 async def get_agent_response(message, history):
     """Process user message and return agent response"""
     logger.info(f"Processing message: {message}")
+    logger.info(f"Processing message: {message}")
     try:
+        logger.debug("Fetching tools from client")
         logger.debug("Fetching tools from client")
         tools = await client.get_tools()
         logger.debug(f"Retrieved {len(tools)} tools")
         
         logger.debug("Creating react agent")
+        logger.debug(f"Retrieved {len(tools)} tools")
+        
+        logger.debug("Creating react agent")
         agent = create_react_agent(llm, tools)
+        logger.debug("Invoking agent")
         logger.debug("Invoking agent")
         response = await agent.ainvoke({"messages": message})
         
         logger.info("Agent response generated successfully")
+        
+        logger.info("Agent response generated successfully")
         return response['messages'][-1].content if isinstance(response['messages'], list) else str(response)
     except Exception as e:
+        logger.error(f"Error processing request: {str(e)}", exc_info=True)
         logger.error(f"Error processing request: {str(e)}", exc_info=True)
         return f"Error processing request: {str(e)}"
 
 async def chat_interface(message, history):
     """Gradio async chat interface function"""
     logger.debug(f"Chat interface received message: {message}")
+    logger.debug(f"Chat interface received message: {message}")
     response = await get_agent_response(message, history)
+    logger.debug(f"Chat interface returning response: {response}")
     logger.debug(f"Chat interface returning response: {response}")
     return response
 
