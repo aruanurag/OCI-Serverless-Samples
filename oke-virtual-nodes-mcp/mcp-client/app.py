@@ -52,7 +52,7 @@ try:
         {
             "tools_server": {
                 "transport": "streamable_http",
-                "url": f"http://{ip}:80/mcp/",
+                "url": f"http://{ip}:8080/mcp/",
                 "timeout": 30.0,
             },
         }

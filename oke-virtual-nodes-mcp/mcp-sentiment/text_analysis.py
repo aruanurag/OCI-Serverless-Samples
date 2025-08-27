@@ -8,19 +8,33 @@ from oci.retry import DEFAULT_RETRY_STRATEGY
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def analyze_text(text: str) -> dict:
-    logger.info(f"Starting text analysis for input: {text[:50]}...")  # Log first 50 chars
-    try:
-        logger.debug("Loading OCI signer")
-         # Initialize Resource Principal signer
-        signer = oci.auth.signers.get_oke_workload_identity_resource_principal_signer()      
+def create_ai_client():
+    """Initialize and return the OCI AI Language client based on environment."""
+    is_dev_env = os.environ.get("ENVIRONMENT", "").lower() == "dev"
+    
+    if is_dev_env:
+        logger.debug("Loading OCI configuration for Dev environment")
+        config = oci.config.from_file()
+        config["connection_timeout"] = 10.0
+        config["read_timeout"] = 120.0
+        logger.debug(f"OCI config loaded: {config.get('region')}")
+        logger.debug("Initializing AI Language client with config")
+        return oci.ai_language.AIServiceLanguageClient(config)
+    else:
+        logger.debug("Loading OCI signer for non-Dev environment")
+        signer = oci.auth.signers.get_oke_workload_identity_resource_principal_signer()
         region = os.environ.get("OCI_REGION", "us-ashburn-1")
-        logger.debug("Initializing AI Language client")
-        ai_client = oci.ai_language.AIServiceLanguageClient(
+        logger.debug("Initializing AI Language client with signer")
+        return oci.ai_language.AIServiceLanguageClient(
             config={"region": region},
             signer=signer
         )
-        
+    
+def analyze_text(text: str) -> dict:
+    logger.info(f"Starting text analysis for input: {text[:50]}...")  # Log first 50 chars
+    try:
+        ai_client = create_ai_client()
+
         logger.debug("Preparing text document")
         text_document = TextDocument(key="input_text", text=text, language_code="en")
 
@@ -31,7 +45,6 @@ def analyze_text(text: str) -> dict:
             )
         )
         logger.debug(f"Text classification received: {text_classification.data}")
-               
         
         logger.debug("Performing key phrase extraction")
         key_phrase_details = BatchDetectLanguageKeyPhrasesDetails(documents=[text_document])

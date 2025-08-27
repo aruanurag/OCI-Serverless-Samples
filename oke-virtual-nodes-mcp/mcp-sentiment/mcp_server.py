@@ -21,7 +21,7 @@ def sentiment_analysis(text: str) -> str:
         text (str): The text to analyze
 
     Returns:
-        str: A JSON string containing polarity, subjectivity, and assessment
+        str: A JSON string containing text_classification.label text_classification.score and key phrases
     """
     result = analyze_text(text)
     # blob = TextBlob(text)

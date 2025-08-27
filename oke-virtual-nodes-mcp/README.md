@@ -30,10 +30,6 @@ Before you begin, ensure you have the following installed:
    - `tenancy_ocid`
    - `compartment_ocid`
    - `region`
-   - `vcn_id`
-   - `control_plane_subnet_id`
-   - `load_balancer_subnet_id`
-   - `virtual_node_subnet_id`
 
 ---
 
@@ -41,52 +37,40 @@ Before you begin, ensure you have the following installed:
 Run the following:
 
 ```bash
-cd okvirtualnodes.mcp
+cd oke-virtual-nodes-mcp
 terraform init
 terraform plan
 terraform apply
 ```
 
 This will create:
+- A VCN with 3 subnets
 - An OKE cluster
 - A Language Service endpoint
 - Virtual networks
-- A Container repository
+- A Container registry 
 
-👉 Copy the name of the container repository created.
+👉 Copy the name of the container registry created: `<region-key>.ocir.io/<tenancy-namespace>/<registry>` is output after running apply.
 
 ### Step 3: Build and Push the MCP Server Image
-Navigate to the `mcpsentiment/` directory.
+Navigate to the `mcp-sentiment/` directory.
 
-Build the Docker image and tag it with your repo name:
-
-```bash
-docker build -t <region-key>.ocir.io/<tenancy-namespace>/<repo-name>:v1 .
-```
-
-Push it to your repo:
+Build the Docker image and tag it with your registry name:
 
 ```bash
-docker push <region-key>.ocir.io/<tenancy-namespace>/<repo-name>:v1
+docker build -t <registry-name>:v1 .
 ```
 
-### Step 4: Configure OKE to Pull from OCIR
-Create a Docker registry secret in your cluster:
+Push it to the created registry:
 
 ```bash
-kubectl create secret docker-registry ocirsecret \
-  --docker-server=<region-key>.ocir.io \
-  --docker-username='<tenancy-namespace>/<username>' \
-  --docker-password='<auth-token>' \
-  --docker-email='<email>'
+docker push <registry-name>:v1
 ```
 
-This secret allows your OKE pods to authenticate and pull images from your private OCIR repository.
-
-### Step 5: Deploy MCP Server on OKE
+### Step 4: Deploy MCP Server on OKE
 Navigate to the `k8s/` folder.
 
-Open the manifest file (`manifest.yaml`) and update the image name with your repo and tag.
+Open the manifest file (`manifest.yaml`) and update the image `<Your image tag>` with your tag (i.e. `<registry-name>:v1`).
 
 Apply the manifest:
 
@@ -94,13 +78,32 @@ Apply the manifest:
 kubectl apply -f manifest.yaml
 ```
 
-Wait for the Load Balancer service to be provisioned.  
-👉 Copy the public IP once available.
+Wait for the Load Balancer service to be provisioned:
+
+`kubectl -n mcp get services`
+
+👉 Copy the External-IP once it is available.
+
+### Step 5: Configure OKE to Pull from OCIR
+Create a Docker registry secret in your cluster:
+
+```bash
+kubectl create secret docker-registry ocirsecret \
+  --docker-server=<region-key>.ocir.io \
+  --docker-username='<tenancy-namespace>/<username>' \
+  --docker-password='<auth-token>' \
+  --docker-email='<email>' \
+  --namespace mcp
+```
+
+This secret allows your OKE pods to authenticate and pull images from your private registry.
 
 ### Step 6: Run the MCP Client
 Navigate to the `mcp-client/` directory.
 
-Open `agent-client.py` and update the URL with the public IP of your MCP server.
+Edit `agent-client.py` and update variables:
+- `<Your-mcp-server-ip>`: External-IP of the load balancer which we copied in step 4.
+- `<Your compartment OCID>`: OCID of tenancy root compartment. 
 
 Run the client:
 
@@ -108,7 +111,7 @@ Run the client:
 python agent-client.py
 ```
 
-You’ll get a URL with a UI where you can interact with the MCP agent.
+ A URL is output which leads to a UI where you can interact with the MCP agent.
 
 ---
 
