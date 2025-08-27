@@ -1,5 +1,5 @@
 oci>=2.125.0 
-langchain-community>=0.2.0 
+langchain-community>=0.3.27 
 langchain-mcp-adapters>=0.1.0 
 langgraph>=0.1.0 
 gradio>=4.0.0
