@@ -1,3 +1,4 @@
+# agent_client.py
 import os
 import gradio as gr
 from mcp import ClientSession, StdioServerParameters
@@ -65,26 +66,37 @@ except Exception as e:
 async def get_agent_response(message, history):
     """Process user message and return agent response"""
     logger.info(f"Processing message: {message}")
+    logger.info(f"Processing message: {message}")
     try:
+        logger.debug("Fetching tools from client")
         logger.debug("Fetching tools from client")
         tools = await client.get_tools()
         logger.debug(f"Retrieved {len(tools)} tools")
         
         logger.debug("Creating react agent")
+        logger.debug(f"Retrieved {len(tools)} tools")
+        
+        logger.debug("Creating react agent")
         agent = create_react_agent(llm, tools)
+        logger.debug("Invoking agent")
         logger.debug("Invoking agent")
         response = await agent.ainvoke({"messages": message})
         
         logger.info("Agent response generated successfully")
+        
+        logger.info("Agent response generated successfully")
         return response['messages'][-1].content if isinstance(response['messages'], list) else str(response)
     except Exception as e:
+        logger.error(f"Error processing request: {str(e)}", exc_info=True)
         logger.error(f"Error processing request: {str(e)}", exc_info=True)
         return f"Error processing request: {str(e)}"
 
 async def chat_interface(message, history):
     """Gradio async chat interface function"""
     logger.debug(f"Chat interface received message: {message}")
+    logger.debug(f"Chat interface received message: {message}")
     response = await get_agent_response(message, history)
+    logger.debug(f"Chat interface returning response: {response}")
     logger.debug(f"Chat interface returning response: {response}")
     return response
 

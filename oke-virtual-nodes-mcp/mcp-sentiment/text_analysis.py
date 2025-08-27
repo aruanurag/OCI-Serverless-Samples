@@ -27,9 +27,8 @@ def create_ai_client():
         logger.debug("Initializing AI Language client with signer")
         return oci.ai_language.AIServiceLanguageClient(
             config={"region": region},
-            signer=signer
-        )
-    
+            signer=signer)
+
 def analyze_text(text: str) -> dict:
     logger.info(f"Starting text analysis for input: {text[:50]}...")  # Log first 50 chars
     try:
@@ -45,6 +44,7 @@ def analyze_text(text: str) -> dict:
             )
         )
         logger.debug(f"Text classification received: {text_classification.data}")
+               
         
         logger.debug("Performing key phrase extraction")
         key_phrase_details = BatchDetectLanguageKeyPhrasesDetails(documents=[text_document])
