@@ -2,3 +2,4 @@ oci==2.133.0
 mcp>=1.8.1
 fastmcp==2.*
 uvicorn>=0.30
+textblob>=0.17.1
