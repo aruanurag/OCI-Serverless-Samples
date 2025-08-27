@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize LLM
 logger.info("Initializing OCI Generative AI model")
+load_dotenv()
 try:
-    load_dotenv()
     llm = ChatOCIGenAI(
         model_id=os.getenv("MODEL_ID"),
         service_endpoint=os.getenv("SERVICE_ENDPOINT"),
@@ -46,14 +46,12 @@ except Exception as e:
 # Initialize client
 logger.info("Initializing MultiServerMCPClient")
 try:
-    load_dotenv()
-    ip = os.getenv("TOOL_SERVER_IP")
-    port = os.getenv("TOOL_SERVER_PORT")
+    mcp_url = os.getenv("MCP_URL")
     client = MultiServerMCPClient(
         {
             "tools_server": {
                 "transport": "streamable_http",
-                "url": f"http://{ip}:8080/mcp/",
+                "url": mcp_url,
                 "timeout": 30.0,
             },
         }
@@ -102,7 +100,6 @@ async def chat_interface(message, history):
 
 def main():
     """Create and launch Gradio UI"""
-    load_dotenv()
     logger.info("Starting Gradio UI")
     try:
         interface = gr.ChatInterface(
