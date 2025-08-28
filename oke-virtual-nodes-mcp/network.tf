@@ -21,6 +21,7 @@ module "network" {
     "control_plane" = {
       cidr_block = var.control_subnet_cidr_block
       is_public  = true
+      dns_label = "control"
     },
     "data_plane" = {
       cidr_block          = var.data_subnet_cidr_block
