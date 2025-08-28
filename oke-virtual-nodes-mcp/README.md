@@ -101,14 +101,14 @@ This secret allows your OKE pods to authenticate and pull images from your priva
 ### Step 6: Run the MCP Client
 Navigate to the `mcp-client/` directory.
 
-Edit `agent-client.py` and update variables:
-- `<Your-mcp-server-ip>`: External-IP of the load balancer which we copied in step 4.
-- `<Your compartment OCID>`: OCID of tenancy root compartment. 
+Edit `.env` and update variables:
+- `<External IP>`: External-IP of the load balancer which we copied in step 4.
+- `ocid1.compartment.oc1....`: OCID of tenancy root compartment. 
 
 Run the client:
 
 ```bash
-python agent-client.py
+app.py
 ```
 
  A URL is output which leads to a UI where you can interact with the MCP agent.
