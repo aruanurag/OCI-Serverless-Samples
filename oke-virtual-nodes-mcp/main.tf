@@ -23,11 +23,11 @@ resource "oci_identity_policy" "mcp_workload_policy" {
 
   statements = [
     <<EOT
-Allow any-user to manage all-resources in tenancy where all {
-  request.principal.type = workload,
-  request.principal.namespace = mcp,
-  request.principal.service_account = fastmcp-server-sa,
-  request.principal.cluster_id = ${module.oke_virtual_nodes.cluster_id}
+Allow any-user to use ai-service-language-family in tenancy where all {
+  request.principal.type = 'workload',
+  request.principal.namespace = 'mcp',
+  request.principal.service_account = 'fastmcp-server-sa',
+  request.principal.cluster_id = '${module.oke_virtual_nodes.cluster_id}'
 }
 EOT
   ]
