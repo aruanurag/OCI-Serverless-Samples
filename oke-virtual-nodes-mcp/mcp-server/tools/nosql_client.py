@@ -2,9 +2,11 @@ import oci
 import logging
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
 from typing import Dict, Any, Optional, List
 from oci.retry import DEFAULT_RETRY_STRATEGY
+import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -38,306 +40,269 @@ def get_compartment_id() -> str:
         raise ValueError("COMPARTMENT_ID environment variable is required")
     return compartment_id
 
-def get_table_name() -> str:
+def get_order_table_name() -> str:
     """Get the table name from environment variables with default fallback."""
-    return os.environ.get("NOSQL_TABLE_NAME", "sentiment_analysis_results")
+    return os.environ.get("ORDER_TABLE_NAME", "order_info")
 
-def create_table_if_not_exists(table_name: str, compartment_id: str) -> bool:
-    """
-    Create the sentiment analysis results table if it doesn't exist.
-    
-    Args:
-        table_name (str): Name of the table to create
-        compartment_id (str): OCI compartment ID
-        
-    Returns:
-        bool: True if table exists or was created successfully, False otherwise
-    """
-    try:
-        nosql_client = create_nosql_client()
-        
-        # Check if table exists
-        try:
-            logger.debug(f"Checking if table {table_name} exists")
-            nosql_client.get_table(
-                table_name_or_id=table_name,
-                compartment_id=compartment_id
-            )
-            logger.info(f"Table {table_name} already exists")
-            return True
-        except oci.exceptions.ServiceError as e:
-            if e.status == 404:
-                logger.info(f"Table {table_name} doesn't exist, creating it")
-                # Table doesn't exist, create it
-                pass
-            else:
-                logger.error(f"Service error checking table: {e.message}")
-                raise
-        
-        # Define table schema
-        table_details = oci.nosql.models.CreateTableDetails(
-            name=table_name,
-            compartment_id=compartment_id,
-            ddl_statement="""
-            CREATE TABLE sentiment_analysis_results (
-                id STRING,
-                text_content STRING,
-                sentiment_result STRING,
-                analysis_timestamp STRING,
-                user_id STRING,
-                session_id STRING,
-                PRIMARY KEY (id)
-            )
-            """
-        )
-        
-        logger.debug("Creating table with schema")
-        # Create table
-        create_response = nosql_client.create_table(
-            create_table_details=table_details
-        )
-        
-        logger.debug("Waiting for table to become active")
-        # Wait for table to be active
-        waiter = oci.wait_until(
-            nosql_client,
-            create_response,
-            'lifecycle_state',
-            'ACTIVE',
-            max_wait_seconds=300
-        )
-        
-        logger.info(f"Table {table_name} created successfully")
-        return True
-        
-    except oci.exceptions.ServiceError as e:
-        logger.error(f"Service error creating table: {e.message}, Status: {e.status}, Code: {e.code}")
-        return False
-    except Exception as e:
-        logger.error(f"Unexpected error creating table: {str(e)}")
-        return False
+def get_customer_table_name() -> str:
+    """Get the table name from environment variables with default fallback."""
+    return os.environ.get("CUSTOMER_TABLE_NAME", "customer_info")
 
-def upload_sentiment_result(
-    text_content: str,
-    sentiment_result: Dict[str, Any],
-    user_id: Optional[str] = None,
-    session_id: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    Upload sentiment analysis result to NoSQL table.
     
-    Args:
-        text_content (str): The original text that was analyzed
-        sentiment_result (Dict[str, Any]): The sentiment analysis result
-        user_id (str, optional): User identifier
-        session_id (str, optional): Session identifier
-        
-    Returns:
-        Dict[str, Any]: Upload result with success status and record ID
-    """
-    logger.info(f"Starting sentiment result upload for text: {text_content[:50]}...")
+
+def seed_customer_info_table():
+    """Seed the table with 20 sample customer records."""
+    logger.info("Seeding customer info table with 20 records")
     
-    try:
-        # Get configuration
-        compartment_id = get_compartment_id()
-        table_name = get_table_name()
-        
-        # Ensure table exists
-        if not create_table_if_not_exists(table_name, compartment_id):
-            raise Exception("Failed to create or verify table existence")
-        
-        # Generate unique ID
-        import uuid
-        record_id = str(uuid.uuid4())
-        
-        # Prepare row data
+    # Sample data
+    customer_ids = [
+        "CUST01", "CUST02", "CUST03", "CUST04", "CUST05",
+        "CUST06", "CUST07", "CUST08", "CUST09", "CUST10",
+        "CUST11", "CUST12", "CUST13", "CUST14", "CUST15",
+        "CUST16", "CUST17", "CUST18", "CUST19", "CUST20"
+    ]
+    sample_names = [
+        "John Doe", "Jane Smith", "Alice Johnson", "Bob Brown", "Charlie Davis",
+        "David Evans", "Eve Foster", "Frank Green", "Grace Harris", "Henry Irving",
+        "Ivy Jackson", "Jack King", "Karen Lee", "Larry Miller", "Mary Nelson",
+        "Nancy Owens", "Oliver Parker", "Paula Quinn", "Quincy Roberts", "Rachel Scott"
+    ]
+    sample_addresses = [
+        "123 Main St", "456 Elm St", "789 Oak St", "101 Pine St", "202 Maple St",
+        "303 Birch St", "404 Cedar St", "505 Walnut St", "606 Chestnut St", "707 Ash St",
+        "808 Beech St", "909 Cherry St", "1010 Dogwood St", "1111 Elm St", "1212 Fir St",
+        "1313 Grape St", "1414 Holly St", "1515 Ivy St", "1616 Juniper St", "1717 Kiwi St"
+    ]
+    sample_emails = [
+        "john@example.com", "jane@example.com", "alice@example.com", "bob@example.com", "charlie@example.com",
+        "david@example.com", "eve@example.com", "frank@example.com", "grace@example.com", "henry@example.com",
+        "ivy@example.com", "jack@example.com", "karen@example.com", "larry@example.com", "mary@example.com",
+        "nancy@example.com", "oliver@example.com", "paula@example.com", "quincy@example.com", "rachel@example.com"
+    ]
+    sample_phones = [
+        "123-456-7890", "234-567-8901", "345-678-9012", "456-789-0123", "567-890-1234",
+        "678-901-2345", "789-012-3456", "890-123-4567", "901-234-5678", "012-345-6789",
+        "123-456-7891", "234-567-8902", "345-678-9013", "456-789-0124", "567-890-1235",
+        "678-901-2346", "789-012-3457", "890-123-4568", "901-234-5679", "012-345-6790"
+    ]
+    table_name = get_customer_table_name()
+    nosql_client = create_nosql_client()
+    compartment_id = get_compartment_id()
+    for i in range(20):        
         row_data = {
-            "id": record_id,
-            "text_content": text_content,
-            "sentiment_result": json.dumps(sentiment_result),
-            "analysis_timestamp": datetime.utcnow().isoformat(),
-            "user_id": user_id or "anonymous",
-            "session_id": session_id or "default"
+            "customerId": customer_ids[i],
+            "name": sample_names[i],
+            "address": sample_addresses[i],
+            "email": sample_emails[i],
+            "phone": sample_phones[i]
         }
         
-        logger.debug(f"Preparing to insert row with ID: {record_id}")
-        
-        # Get NoSQL client
-        nosql_client = create_nosql_client()
-        
-        # Insert row
-        insert_response = nosql_client.update_row(
-            table_name_or_id=table_name,
-            update_row_details=oci.nosql.models.UpdateRowDetails(
-                value=row_data,
-                is_get_return_row=True
-            ),
-            retry_strategy=DEFAULT_RETRY_STRATEGY
-        )
-        
-        logger.info(f"Successfully uploaded sentiment result with ID: {record_id}")
-        
-        return {
-            "success": True,
-            "record_id": record_id,
-            "timestamp": row_data["analysis_timestamp"],
-            "message": "Sentiment result uploaded successfully"
-        }
-        
-    except oci.exceptions.ServiceError as e:
-        logger.error(f"Service error uploading sentiment result: {e.message}, Status: {e.status}, Code: {e.code}")
-        return {
-            "success": False,
-            "error": f"Service error: {e.message}",
-            "message": "Failed to upload sentiment result"
-        }
-    except Exception as e:
-        logger.error(f"Unexpected error uploading sentiment result: {str(e)}")
-        return {
-            "success": False,
-            "error": str(e),
-            "message": "Failed to upload sentiment result"
-        }
+        try:
+            nosql_client.update_row(
+                
+                table_name_or_id=table_name,
+                update_row_details=oci.nosql.models.UpdateRowDetails(
+                    value=row_data,
+                    compartment_id=compartment_id,
+                    is_get_return_row=True
+                ),
+                retry_strategy=DEFAULT_RETRY_STRATEGY
+            )
+            logger.debug(f"Inserted record for {sample_names[i]} with ID: {customer_ids[i]}")
+        except Exception as e:
+            logger.error(f"Error inserting seed record {i+1}: {str(e)}")
+    
+    logger.info("Seeding completed")
 
-def query_sentiment_results(
-    user_id: Optional[str] = None,
-    session_id: Optional[str] = None,
-    limit: int = 100
-) -> Dict[str, Any]:
+def random_date(days_back=30):
+    """Generate a random datetime within the last `days_back` days."""
+    return datetime.now() - timedelta(days=random.randint(0, days_back))
+
+def seed_order_info_table():
     """
-    Query sentiment analysis results from the table.
+    Seed the order_info table with sample data for customers.
+    Each customer will get 3 random orders.
+    """
+    print("Seeding order_info table with random sample data...")
+
+    customer_ids = [
+        "CUST01", "CUST02", "CUST03", "CUST04", "CUST05",
+        "CUST11", "CUST12", "CUST13", "CUST14", "CUST15",
+        "CUST16", "CUST17", "CUST18", "CUST19", "CUST20"
+    ]
+    statuses = ["OPEN", "CLOSED", "SHIPPED", "CANCELLED"]
+    table_name = get_order_table_name()
+    nosql_client = create_nosql_client()
+    compartment_id = get_compartment_id()
+    for cust_id in customer_ids:
+        for i in range(3):  # 3 orders per customer
+            order = {
+                "customerId": cust_id,
+                "orderId": str(uuid.uuid4()),
+                "status": random.choice(statuses),
+                "date": random_date().isoformat(),
+                "amount": round(random.uniform(20, 500), 2),
+            }
+            try:
+                nosql_client.update_row(
+                
+                    table_name_or_id=table_name,
+                    update_row_details=oci.nosql.models.UpdateRowDetails(
+                        value=order,
+                        compartment_id=compartment_id,
+                        is_get_return_row=True
+                    ),
+                    retry_strategy=DEFAULT_RETRY_STRATEGY
+                )
+                logger.debug(f"Inserted record for cust ID: {cust_id}")
+            except Exception as e:
+                logger.error(f"Error inserting seed record {i+1}: {str(e)}")
+    
+    logger.info("Seeding completed for order info table")
+
+def get_customer_by_email(email: str) -> Dict[str, Any]:
+    """
+    Read customer info based on email and return details.
     
     Args:
-        user_id (str, optional): Filter results by user ID
-        session_id (str, optional): Filter results by session ID
-        limit (int): Maximum number of results to return
+        email (str): Customer email
         
     Returns:
-        Dict[str, Any]: Query results
+        Dict[str, Any]: Customer details or error
     """
-    logger.info(f"Starting sentiment results query - user_id: {user_id}, session_id: {session_id}, limit: {limit}")
+    logger.info(f"Querying customer by email: {email}")
     
     try:
-        # Get configuration
         compartment_id = get_compartment_id()
-        table_name = get_table_name()
+        table_name = get_customer_table_name()
         
-        # Build query
-        query = f"SELECT * FROM {table_name}"
-        where_conditions = []
+        query = f"SELECT * FROM {table_name} WHERE email = '{email}'"
         
-        if user_id:
-            where_conditions.append(f"user_id = '{user_id}'")
-        if session_id:
-            where_conditions.append(f"session_id = '{session_id}'")
-        
-        if where_conditions:
-            query += " WHERE " + " AND ".join(where_conditions)
-        
-        query += f" ORDER BY analysis_timestamp DESC LIMIT {limit}"
-        
-        logger.debug(f"Executing query: {query}")
-        
-        # Get NoSQL client
         nosql_client = create_nosql_client()
-        
-        # Execute query
+
+        query_details = oci.nosql.models.QueryDetails(
+            statement=query,
+            compartment_id=compartment_id
+        )
         query_response = nosql_client.query(
-            query=query,
+            query_details=query_details,
             retry_strategy=DEFAULT_RETRY_STRATEGY
         )
         
-        logger.debug(f"Query response received with {len(query_response.data.items)} items")
+        if not query_response.data.items:
+            return {
+                "success": False,
+                "message": "No customer found with that email"
+            }
         
-        results = []
-        for row in query_response.data.items:
-            # Parse the sentiment_result JSON string back to dict
-            sentiment_result = json.loads(row["sentiment_result"])
-            results.append({
-                "id": row["id"],
-                "text_content": row["text_content"],
-                "sentiment_result": sentiment_result,
-                "analysis_timestamp": row["analysis_timestamp"],
-                "user_id": row["user_id"],
-                "session_id": row["session_id"]
-            })
-        
-        logger.info(f"Successfully queried {len(results)} sentiment results")
-        
+        row = query_response.data.items[0]
         return {
             "success": True,
-            "count": len(results),
-            "results": results
+            "customer": {
+                "name": row["name"],
+                "address": row["address"],
+                "email": row["email"],
+                "phone": row["phone"]
+            }
         }
         
-    except oci.exceptions.ServiceError as e:
-        logger.error(f"Service error querying sentiment results: {e.message}, Status: {e.status}, Code: {e.code}")
-        return {
-            "success": False,
-            "error": f"Service error: {e.message}",
-            "message": "Failed to query sentiment results"
-        }
     except Exception as e:
-        logger.error(f"Unexpected error querying sentiment results: {str(e)}")
+        logger.error(f"Error querying customer by email: {str(e)}")
         return {
             "success": False,
             "error": str(e),
-            "message": "Failed to query sentiment results"
+            "message": "Failed to query customer"
         }
 
-def delete_sentiment_result(record_id: str) -> Dict[str, Any]:
+def get_customer_id_by_email(email: str) -> Dict[str, Any]:
     """
-    Delete a specific sentiment analysis result from the table.
+    Get customer ID based on email.
     
     Args:
-        record_id (str): The ID of the record to delete
+        email (str): Customer email
         
     Returns:
-        Dict[str, Any]: Deletion result with success status
+        Dict[str, Any]: Customer ID or error
     """
-    logger.info(f"Starting deletion of sentiment result with ID: {record_id}")
+    logger.info(f"Querying customer ID by email: {email}")
     
     try:
-        # Get configuration
         compartment_id = get_compartment_id()
-        table_name = get_table_name()
+        table_name = get_customer_table_name()
         
-        # Get NoSQL client
+        query = f"SELECT customerId FROM {table_name} WHERE email = '{email}'"
+        
         nosql_client = create_nosql_client()
-        
-        # Delete row
-        delete_response = nosql_client.delete_row(
-            table_name_or_id=table_name,
-            key=[record_id],
+        query_details = oci.nosql.models.QueryDetails(
+            statement=query,
+            compartment_id=compartment_id
+        )
+        query_response = nosql_client.query(
+            query_details=query_details,
             retry_strategy=DEFAULT_RETRY_STRATEGY
         )
         
-        logger.info(f"Successfully deleted sentiment result with ID: {record_id}")
+        if not query_response.data.items:
+            return {
+                "success": False,
+                "message": "No customer found with that email"
+            }
         
+        row = query_response.data.items[0]
         return {
             "success": True,
-            "record_id": record_id,
-            "message": "Sentiment result deleted successfully"
+            "customerId": row["customerId"]
         }
         
-    except oci.exceptions.ServiceError as e:
-        logger.error(f"Service error deleting sentiment result: {e.message}, Status: {e.status}, Code: {e.code}")
-        return {
-            "success": False,
-            "error": f"Service error: {e.message}",
-            "message": "Failed to delete sentiment result"
-        }
     except Exception as e:
-        logger.error(f"Unexpected error deleting sentiment result: {str(e)}")
+        logger.error(f"Error querying customer ID by email: {str(e)}")
         return {
             "success": False,
             "error": str(e),
-            "message": "Failed to delete sentiment result"
+            "message": "Failed to query customer ID"
+        }
+    
+def get_open_orders(customer_id: str):
+    """
+    Fetch all open orders for a given customerId.
+    """
+    logger.info(f"Querying orders for: {customer_id}")
+    
+    try:
+        compartment_id = get_compartment_id()
+        table_name = get_order_table_name()
+        query = f"SELECT orderId, status, date, amount FROM {table_name} WHERE customerId = '{customer_id}' AND status = 'OPEN'"
+        nosql_client = create_nosql_client()
+        query_details = oci.nosql.models.QueryDetails(
+            statement=query,
+            compartment_id=compartment_id
+        )
+        query_response = nosql_client.query(
+            query_details=query_details,
+            retry_strategy=DEFAULT_RETRY_STRATEGY
+        )
+        
+        open_orders = []
+        for row in query_response.data.items:
+            open_orders.append({
+                "orderId": row["orderId"],
+                "status": row["status"],
+                "date": row["date"],
+                "amount": row["amount"]
+            })
+
+        return open_orders
+    except Exception as e:
+        logger.error(f"Error querying orders for customer ID : {customer_id}")
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Failed to get orders"
         }
 
 def get_table_stats() -> Dict[str, Any]:
     """
-    Get statistics about the sentiment analysis results table.
+    Get statistics about the customer info table.
     
     Returns:
         Dict[str, Any]: Table statistics
@@ -347,7 +312,7 @@ def get_table_stats() -> Dict[str, Any]:
     try:
         # Get configuration
         compartment_id = get_compartment_id()
-        table_name = get_table_name()
+        table_name = get_customer_table_name()
         
         # Get NoSQL client
         nosql_client = create_nosql_client()

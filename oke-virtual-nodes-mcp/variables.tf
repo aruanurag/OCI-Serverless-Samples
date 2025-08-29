@@ -41,3 +41,14 @@ variable "load_balancer_subnet_cidr_block" {
   description = "The CIDR block for the public subnet."
   default     = "10.0.32.0/24"
 }
+
+variable "nosql_table_name" {
+  default = "customer_info"
+}
+
+variable "order_table_name" {
+  default = "order_info"
+}
+variable "notification_email" {
+  
+}
