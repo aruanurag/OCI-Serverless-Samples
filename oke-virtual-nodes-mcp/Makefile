@@ -9,9 +9,9 @@ KUBECONFIG_PATH ?= "$(HOME)/.kube/config"
 K8S_NAMESPACE   ?= "mcp"
 MANIFEST_FILE   ?= "$(CURDIR)/mcp-server/k8s/manifest.yaml"
 # OCI Variables for terraform.tfvars
-TENANCY_OCID       ?= "ocid1.tenancy.oc1..aaaaaaaa3ocohl2rfeixo3ikcbfeq4iveaysj5dfv2uo3kgnidowlifw6aiq"
-COMPARTMENT_OCID   ?= "ocid1.tenancy.oc1..aaaaaaaa3ocohl2rfeixo3ikcbfeq4iveaysj5dfv2uo3kgnidowlifw6aiq"
-NOTIFICATION_EMAIL ?= "email@example.com"
+TENANCY_OCID       ?= ""
+COMPARTMENT_OCID   ?= ""
+NOTIFICATION_EMAIL ?= ""
 IMAGE_VERSION   ?= "0.0.1"
 SED_INPLACE = sed -i'' -e
 
@@ -20,12 +20,13 @@ SED_INPLACE = sed -i'' -e
 # PHONY TARGETS
 # ------------------------------------------------------------------------------
 # .PHONY ensures that make will not confuse these targets with actual files.
-.PHONY: all plan apply kubeconfig create-secret build-push deploy destroy clean update-tfvars update-manifest
+.PHONY: all plan apply kubeconfig create-secret build-push deploy destroy clean update-tfvars update-manifest kubectl create-namespace create-docker-credentials docker-build docker-push deploy destroy-manifest destroy-terraform mcp-server
 
 # MAIN TARGET
 # ------------------------------------------------------------------------------
 # This is the default target that runs when you just type 'make'.
-all: update-tfvars init plan apply update-manifest
+all: update-tfvars init plan apply update-manifest kubectl create-namespace create-docker-credentials docker-build docker-push deploy mcp-server
+destroy-all: destroy-manifest destroy-terraform 
 
 # TFVARS TARGET
 # ------------------------------------------------------------------------------
@@ -108,6 +109,10 @@ docker-push: docker-build
 
 deploy:
 	kubectl --kubeconfig $(KUBECONFIG_PATH) apply -f $(MANIFEST_FILE)
+
+mcp-server:
+	@echo "mcp url for your client is"
+	kubectl --kubeconfig $(KUBECONFIG_PATH) get services fastmcp-server -n mcp -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
 destroy-manifest: 
 	kubectl --kubeconfig $(KUBECONFIG_PATH) delete -f $(MANIFEST_FILE)
