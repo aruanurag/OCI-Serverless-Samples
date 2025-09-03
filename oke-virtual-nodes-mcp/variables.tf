@@ -15,6 +15,7 @@ variable "compartment_id" {
 
 variable "mcp_container_repository_name" {
   description = "The name of the container repository to use for the MCP container."
+  default     = "mcp-server-repo"
 }
 
 variable "kubernetes_version" {

@@ -19,8 +19,8 @@ data:
   APP_NAME: "fastmcp-demo"
   PORT: "8080"
   HOST: "0.0.0.0"
-  NOTIFICATION_TOPIC_ID: "<Notification topic OCID>"
-  COMPARTMENT_ID: "<compartment id>"
+  NOTIFICATION_TOPIC_ID: "<Notification_Topic_OCID>"
+  COMPARTMENT_ID: <Compartment_OCID>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,7 +42,7 @@ spec:
         - name: ocirsecret
       containers:
         - name: fastmcp-server
-          image: iad.ocir.io/idrvpjvdnx7h/mcp-sentiment-tool-repo:0.0.3
+          image: <mcp-server-image-tag>
           envFrom:
             - configMapRef:
                 name: mcp-config

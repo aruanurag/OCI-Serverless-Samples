@@ -4,10 +4,15 @@ output "mcp_server_repository_path" {
   value       = "${lower(data.oci_identity_regions.current.regions[0].key)}.ocir.io/${data.oci_objectstorage_namespace.this.namespace}/${var.mcp_container_repository_name}"
 }
 
-output "notification_topic_id" {
+output "notification_topic_ocid" {
   value = oci_ons_notification_topic.email_topic.id
 }
 
 output "subscription_id" {
   value = oci_ons_subscription.email_subscription.id
 }
+
+output "cluster_id" {
+  value = module.oke_virtual_nodes.cluster_id
+}
+
