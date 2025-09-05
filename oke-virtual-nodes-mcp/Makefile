@@ -13,7 +13,8 @@ TENANCY_OCID       ?= ""
 COMPARTMENT_OCID   ?= ""
 NOTIFICATION_EMAIL ?= ""
 IMAGE_VERSION   ?= "0.0.1"
-SED_INPLACE = sed -i'' -e
+SED_INPLACE = sed -i'' -e  #SED_INPLACE = sed -i -e for LINUX
+
 
 
 
