@@ -1,4 +1,4 @@
-OCI Serverless Samples Repository
+**OCI Serverless Samples Repository**
 
 Welcome to the OCI Serverless Samples Repository! 
 
