@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Oracle and/or its affiliates.
+#
+# Licensed under the Universal Permissive License v 1.0 as shown at
+# https://oss.oracle.com/licenses/upl
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+# -----------------------------------------------------------------------------
+
 variable "region" {
   description = "The OCI region identifier, e.g., 'us-ashburn-1'."
   type        = string
