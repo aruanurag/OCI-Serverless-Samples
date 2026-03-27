@@ -15,7 +15,7 @@ output "queue_messages_endpoint" {
 
 output "queue_state" {
   description = "The current state of the OCI Queue"
-  value       = oci_queue_queue.main.lifecycle_state
+  value       = oci_queue_queue.main.state
 }
 
 output "queue_retention_in_seconds" {

@@ -33,11 +33,7 @@ variable "timeout_in_seconds" {
   default     = 30
 }
 
-variable "dead_letter_queue_delivery_attempts" {
-  description = "Number of delivery attempts before moving to dead letter queue"
-  type        = number
-  default     = 5
-}
+
 
 variable "create_dead_letter_queue" {
   description = "Whether to create a dedicated dead letter queue"
@@ -65,6 +61,6 @@ variable "freeform_tags" {
 
 variable "defined_tags" {
   description = "Defined tags to apply to resources"
-  type        = map(map(string))
+  type        = map(string)
   default     = {}
 }

@@ -42,15 +42,7 @@ variable "timeout_in_seconds" {
   }
 }
 
-variable "dead_letter_queue_delivery_attempts" {
-  description = "The number of delivery attempts before a message is moved to dead letter queue. Default is 5"
-  type        = number
-  default     = 5
-  validation {
-    condition     = var.dead_letter_queue_delivery_attempts >= 1 && var.dead_letter_queue_delivery_attempts <= 100
-    error_message = "Dead letter queue delivery attempts must be between 1 and 100."
-  }
-}
+
 
 variable "create_dead_letter_queue" {
   description = "Whether to create a dedicated dead letter queue"
@@ -76,6 +68,6 @@ variable "freeform_tags" {
 
 variable "defined_tags" {
   description = "Defined tags to apply to the queue"
-  type        = map(map(string))
+  type        = map(string)
   default     = {}
 }
